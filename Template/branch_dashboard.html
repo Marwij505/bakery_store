@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Branch Performance · HARMSTORE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS khusus halaman branch -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='branch_dashboard.css') }}">
+</head>
+<body>
+
+<div class="page-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <div class="brand-circle">HR</div>
+        <div class="brand-text">
+          <div class="brand-title">HARMSTORE</div>
+          <div class="brand-subtitle">Cake · Pastry · Coffee</div>
+        </div>
+      </div>
+
+      <!-- My Profile (Coming Soon) - placed above "Signed in as" -->
+    <ul class="profile-shortcut">
+      <li class="menu-item is-soon">
+        <a href="{{ url_for('coming_soon', feature='my_profile') }}">
+          My Profile <span class="soon-pill">Coming Soon</span>
+        </a>
+      </li>
+    </ul>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-label">Signed in as</div>
+        <div class="sidebar-user-name">{{ full_name or "Owner" }}</div>
+        <div class="sidebar-user-role">{{ role|capitalize }}</div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <div class="menu-title">Executive Menu</div>
+        <ul>
+          <li class="menu-item {% if active_menu == 'overview' %}is-active{% endif %}">
+              <a href="{{ url_for('owner_dashboard') }}">Executive Overview</a>
+          </li>
+          <li class="menu-item {% if active_menu == 'branches' %}is-active{% endif %}">
+              <a href="{{ url_for('branch_performance') }}">Branch Performance</a>
+          </li>
+          <li class="menu-item {% if active_menu == 'products' %}is-active{% endif %}">
+              <a href="{{ url_for('product_dashboard') }}">Product Insights</a>
+          </li>
+          <li class="menu-item {% if active_menu == 'access' %}is-active{% endif %}">
+              <a href="{{ url_for('access_control') }}">Access Control</a>
+          </li>
+          <li class="menu-item {% if active_menu == 'security' %}is-active{% endif %}">
+              <a href="{{ url_for('security_dashboard') }}">Security & Audit</a>
+          </li>
+
+          <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='approvals') }}">Approvals (Coming Soon)</a>
+          </li>
+          <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='finance') }}">Finance Overview (Coming Soon)</a>
+          </li>
+          <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='inventory') }}">Inventory Watch (Coming Soon)</a>
+          </li>
+          <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='announcements') }}">Announcements (Coming Soon)</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+      <div class="sidebar-copy">© 2025 HARMSTORE · Owner Portal</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="top-header">
+      <div>
+        <h1 class="page-title">Branch Performance</h1>
+        <p class="page-subtitle">
+          Performance view per branch, filtered by country/region and date. Use this page to see which branches are leading and which need attention.
+        </p>
+      </div>
+
+      <!-- FILTERS -->
+      <form class="filters" method="get" action="{{ url_for('branch_performance') }}">
+        <div class="filters-grid">
+          <div class="fg">
+            <label>Country</label>
+            <select name="negara">
+              <option value="">All countries</option>
+              {% for n in negara_list %}
+                <option value="{{ n }}" {% if filter_negara == n %}selected{% endif %}>{{ n }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="fg">
+            <label>City / Region</label>
+            <select name="kota">
+              <option value="">All cities</option>
+              {% for k in kota_list %}
+                <option value="{{ k }}" {% if filter_kota == k %}selected{% endif %}>{{ k }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="fg">
+            <label>Date</label>
+            <input type="date" name="tanggal" value="{{ tanggal_filter }}">
+          </div>
+
+          <div class="fg">
+            <label>Sort by</label>
+            <select name="sort_by">
+              <option value="revenue" {% if sort_by == 'revenue' %}selected{% endif %}>Total revenue</option>
+              <option value="profit"  {% if sort_by == 'profit' %}selected{% endif %}>Profit</option>
+              <option value="growth"  {% if sort_by == 'growth' %}selected{% endif %}>Growth</option>
+              <option value="orders"  {% if sort_by == 'orders' %}selected{% endif %}>Orders</option>
+              <option value="days"    {% if sort_by == 'days' %}selected{% endif %}>Days with sales</option>
+              <option value="name"    {% if sort_by == 'name' %}selected{% endif %}>Branch name</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filters-actions">
+          <button class="btn-apply" type="submit">Apply</button>
+          <a class="btn-reset" href="{{ url_for('branch_performance') }}">Reset</a>
+        </div>
+      </form>
+    </header>
+
+    <!-- FLASH -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <div class="flash-wrapper">
+          {% for category, msg in messages %}
+            <div class="flash flash-{{ category }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- SUMMARY CARDS -->
+    <section class="cards-row">
+      <div class="summary-card">
+        <div class="summary-label">Total branches</div>
+        <div class="summary-value">{{ summary.total_cabang }}</div>
+        <div class="summary-meta">In current filter</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Total revenue</div>
+        <div class="summary-value">Rp {{ "{:,.0f}".format(summary.total_pendapatan or 0).replace(",", ".") }}</div>
+        <div class="summary-meta">All branches in selected period</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Total orders</div>
+        <div class="summary-value">{{ summary.total_pesanan }}</div>
+        <div class="summary-meta">Number of orders recorded</div>
+      </div>
+    </section>
+
+    <!-- GRID -->
+    <section class="content-row">
+
+      <!-- ====== BRANCH RANKING (FULL WIDTH) ====== -->
+      <div class="card card-table">
+        <div class="card-header">
+          <h2>Branch Ranking</h2>
+          <p class="card-subtitle">
+            Branches sorted by the selected metric. Use this table to spot top performers and locations that might need extra support.
+          </p>
+        </div>
+
+        <div class="table-wrapper ranking-scroll">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th style="width:52px;">#</th>
+                <th>Branch</th>
+                <th>City</th>
+                <th>Days</th>
+                <th>Total revenue</th>
+                <th>Orders</th>
+                <th>Profit</th>
+                <th>Margin</th>
+                <th>Growth</th>
+                <th>Operational</th>
+                <th style="min-width:260px;">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% if branches and branches|length > 0 %}
+                {% for b in branches %}
+                  <tr class="{% if detail_branch_id and detail_branch_id == b.id %}is-selected{% endif %}">
+                    <td class="muted">{{ loop.index }}</td>
+
+                    <td>
+                      <div class="cell-strong">{{ b.nama_cabang }}</div>
+                      <div class="cell-sub muted">{{ b.negara }}</div>
+                    </td>
+
+                    <td>{{ b.kota }}</td>
+                    <td>{{ b.hari_aktif or 0 }}</td>
+                    <td>Rp {{ "{:,.0f}".format(b.total_pendapatan or 0).replace(",", ".") }}</td>
+                    <td>{{ b.total_pesanan or 0 }}</td>
+                    <td>Rp {{ "{:,.0f}".format(b.total_laba or 0).replace(",", ".") }}</td>
+                    <td>{{ "{:.1f}".format(b.profit_margin or 0) }}%</td>
+
+                    <td class="{% if (b.growth_pct or 0) < 0 %}neg{% else %}pos{% endif %}">
+                      {{ "{:.1f}".format(b.growth_pct or 0) }}%
+                    </td>
+
+                    <td>
+                      {% set st = (b.status_cabang or '')|lower %}
+                      {% if st == 'aktif' %}
+                        <span class="status-pill status-aktif">Active</span>
+                      {% elif st == 'renovasi' %}
+                        <span class="status-pill status-renovasi">Renovasi</span>
+                      {% elif st == 'tutup' %}
+                        <span class="status-pill status-tutup">Tutup</span>
+                      {% else %}
+                        <span class="status-pill status-unknown">{{ st or 'Unknown' }}</span>
+                      {% endif %}
+                    </td>
+
+                    <td class="col-action">
+                      <div class="action-cell">
+                        <!-- FIX: gunakan filter_negara/filter_kota/tanggal_filter -->
+                        <a class="btn-open-detail"
+                           href="{{ url_for('branch_performance',
+                                            detail_branch_id=b.id,
+                                            negara=filter_negara,
+                                            kota=filter_kota,
+                                            tanggal=tanggal_filter,
+                                            sort_by=sort_by) }}">
+                          Open detail
+                        </a>
+
+                        <form class="status-actions"
+                              method="POST"
+                              action="{{ url_for('toggle_branch_status', branch_id=b.id) }}">
+                          <button class="btn-status btn-green {% if (b.status_cabang|lower) == 'aktif' %}is-current{% endif %}"
+                                  type="submit" name="set_status" value="aktif">
+                            Aktif
+                          </button>
+
+                          <button class="btn-status btn-red {% if (b.status_cabang|lower) == 'tutup' %}is-current{% endif %}"
+                                  type="submit" name="set_status" value="tutup">
+                            Tutup
+                          </button>
+
+                          <button class="btn-status btn-yellow {% if (b.status_cabang|lower) == 'renovasi' %}is-current{% endif %}"
+                                  type="submit" name="set_status" value="renovasi">
+                            Renovasi
+                          </button>
+
+                          <!-- optional: agar balik ke page yang sama -->
+                          <input type="hidden" name="next" value="{{ request.full_path }}">
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="11" class="empty-row">No branches found for the selected filter.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-hint muted">
+          Tip: Click “Open detail” to show Branch Detail below. Use the 3 buttons to set status.
+        </div>
+      </div>
+
+      <!-- ====== BRANCH DETAIL (KIRI) ====== -->
+      <div class="card card-detail">
+        <div class="detail-header">
+          <div>
+            <h2>Branch Detail</h2>
+            <p class="detail-subtitle">
+              Sales trend for the last 3–6 months and top 5 products for a selected branch.
+            </p>
+          </div>
+
+          <form method="get" action="{{ url_for('branch_performance') }}" class="detail-picker">
+            <input type="hidden" name="negara" value="{{ filter_negara }}">
+            <input type="hidden" name="kota" value="{{ filter_kota }}">
+            <input type="hidden" name="tanggal" value="{{ tanggal_filter }}">
+            <input type="hidden" name="sort_by" value="{{ sort_by }}">
+
+            <label for="detail_branch_id" class="muted">Branch</label>
+            <select id="detail_branch_id" name="detail_branch_id" onchange="this.form.submit()">
+              <option value="">Select branch...</option>
+              {% for b in branches %}
+                <option value="{{ b.id }}" {% if detail_branch_id and detail_branch_id == b.id %}selected{% endif %}>
+                  {{ b.nama_cabang }} ({{ b.kota }})
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+
+        {% if detail_branch %}
+          <div class="detail-body">
+
+            <div class="detail-top">
+              <div class="mini">
+                <div class="mini-label">Branch</div>
+                <div class="mini-value">{{ detail_branch.nama_cabang }}</div>
+                <div class="mini-sub muted">{{ detail_branch.kota }} · {{ detail_branch.negara }}</div>
+              </div>
+
+              <div class="mini">
+                <div class="mini-label">Operational status</div>
+                <div class="mini-value">
+                  {% if detail_branch.status_cabang == 'aktif' %}
+                    <span class="status-pill status-aktif">Active</span>
+                  {% elif detail_branch.status_cabang == 'renovasi' %}
+                    <span class="status-pill status-renovasi">Renovasi</span>
+                  {% elif detail_branch.status_cabang == 'tutup' %}
+                    <span class="status-pill status-tutup">Tutup</span>
+                  {% else %}
+                    <span class="status-pill status-unknown">{{ detail_branch.status_cabang or 'Unknown' }}</span>
+                  {% endif %}
+                </div>
+                <div class="mini-sub muted">Change it from Branch Ranking action buttons</div>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-title">Revenue trend (last months)</div>
+
+              {% if monthly_chart and monthly_chart|length > 0 %}
+                <div class="chart">
+                  {% for row in monthly_chart %}
+                    <div class="chart-row">
+                      <div class="chart-label">{{ row.bulan }}</div>
+                      <div class="chart-bar-outer">
+                        <div class="chart-bar-inner"
+                             style="width: {{ (((row.total_pendapatan|float) / (chart_max|float)) * 100) if chart_max else 0 }}%;"></div>
+                      </div>
+                      <div class="chart-value">
+                        Rp {{ "{:,.0f}".format(row.total_pendapatan or 0).replace(",", ".") }}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="empty-text muted">No monthly sales data yet for this branch.</p>
+              {% endif %}
+            </div>
+
+            <div class="mini-table">
+              <div class="mini-table-title">Top 5 products by quantity sold</div>
+
+              {% if top_products and top_products|length > 0 %}
+                <div class="table-wrapper detail-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>Total Sold</th>
+                        <th>Total Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for p in top_products %}
+                        <tr>
+                          <td>{{ p.nama_produk }}</td>
+                          <td>{{ p.total_terjual }}</td>
+                          <td>Rp {{ "{:,.0f}".format(p.total_pendapatan or 0).replace(",", ".") }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <p class="empty-text muted">No product sales data found for this branch.</p>
+              {% endif %}
+            </div>
+
+            <div class="peak-card">
+              <div class="peak-title">Peak hour</div>
+              <div class="peak-note muted">
+                {{ peak_hour.label if peak_hour else "Peak hour not available yet" }}
+              </div>
+            </div>
+
+          </div>
+        {% else %}
+          <div class="detail-empty muted">
+            No branch selected yet. Choose one from the dropdown to see its detail.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ====== BRANCH STATUS (KANAN) ====== -->
+      <aside class="card card-status">
+        <div class="card-header">
+          <h2>Branch Status</h2>
+          <p class="card-subtitle">Status operasional setiap cabang (real-time dari database).</p>
+        </div>
+
+        <div class="status-summary">
+          <div class="mini">
+            <div class="mini-label">Aktif</div>
+            <div class="mini-value">{{ status_counts.get("aktif", 0) }}</div>
+          </div>
+          <div class="mini">
+            <div class="mini-label">Tutup</div>
+            <div class="mini-value">{{ status_counts.get("tutup", 0) }}</div>
+          </div>
+          <div class="mini">
+            <div class="mini-label">Renovasi</div>
+            <div class="mini-value">{{ status_counts.get("renovasi", 0) }}</div>
+          </div>
+        </div>
+
+        <div class="status-list">
+          {% for b in branch_status_list %}
+            {% set s = (b.status_cabang or "")|lower %}
+            {% set pill_class =
+                "status-aktif" if s == "aktif"
+                else ("status-tutup" if s == "tutup" else "status-renovasi")
+            %}
+            <div class="status-row">
+              <div class="status-left">
+                <div class="status-branch">{{ b.nama_cabang }}</div>
+                <div class="muted">
+                  {{ b.kota }}{% if b.kota and b.negara %}, {% endif %}{{ b.negara }}
+                </div>
+              </div>
+              <div class="status-right">
+                <span class="status-pill {{ pill_class }}">{{ s|capitalize }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="status-note muted">
+          Tip: Ubah status cabang lewat tombol Aktif / Tutup / Renovasi di kolom Action pada Branch Ranking.
+        </div>
+      </aside>
+
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>
