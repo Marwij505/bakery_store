@@ -231,7 +231,6 @@ def get_db_connection():
         print("Error connecting to MySQL:", e)
         return None
 
-
 # ============================
 # AUTO USER ACTIVITY TRACKER
 # ============================
