@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Insights · HARMSTORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS khusus halaman produk -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='product_dashboard.css') }}">
+</head>
+<body>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR KIRI -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-circle">HR</div>
+            <div class="brand-text">
+                <div class="brand-title">HARMSTORE</div>
+                <div class="brand-subtitle">Cake · Pastry · Coffee</div>
+            </div>
+        </div>
+
+        <!-- My Profile (Coming Soon) - placed above "Signed in as" -->
+        <ul class="profile-shortcut">
+        <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='my_profile') }}">
+            My Profile <span class="soon-pill">Coming Soon</span>
+            </a>
+        </li>
+        </ul>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-label">Signed in as</div>
+            <div class="sidebar-user-name">{{ full_name or "Owner" }}</div>
+            <div class="sidebar-user-role">{{ role|capitalize }}</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-title">Executive Menu</div>
+            <ul>
+                <li class="menu-item {% if active_menu == 'overview' %}is-active{% endif %}">
+                    <a href="{{ url_for('owner_dashboard') }}">Executive Overview</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'branches' %}is-active{% endif %}">
+                    <a href="{{ url_for('branch_performance') }}">Branch Performance</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'products' %}is-active{% endif %}">
+                    <a href="{{ url_for('product_dashboard') }}">Product Insights</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'access' %}is-active{% endif %}">
+                    <a href="{{ url_for('access_control') }}">Access Control</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'security' %}is-active{% endif %}">
+                    <a href="{{ url_for('security_dashboard') }}">Security & Audit</a>
+                </li>
+            
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='approvals') }}">Approvals (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='finance') }}">Finance Overview (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='inventory') }}">Inventory Watch (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='announcements') }}">Announcements (Coming Soon)</a>
+                </li>
+</ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            <div class="sidebar-copy">© 2025 HARMSTORE · Owner Portal</div>
+        </div>
+    </aside>
+
+    <!-- KONTEN KANAN -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1 class="page-title">Product Insights</h1>
+                <p class="page-subtitle">
+                    Kelola daftar produk HARMSTORE untuk semua cabang.
+                </p>
+            </div>
+        </header>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-wrapper">
+                    {% for category, msg in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- RINGKASAN PRODUK -->
+        <section class="cards-row">
+            <div class="summary-card">
+                <div class="summary-label">Total Produk</div>
+                <div class="summary-value">
+                    {{ produk_list|length }}
+                </div>
+                <div class="summary-meta">Semua status</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Kategori</div>
+                <div class="summary-tags">
+                    {% if kategori_summary %}
+                        {% for row in kategori_summary %}
+                            <span class="tag-pill">
+                                {{ row.kategori }} · {{ row.jumlah }}
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="tag-pill empty">Belum ada kategori</span>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN 2 COLUMNS: LEFT (Inventory + History) | RIGHT (Forms) -->
+        <section class="content-row">
+
+            <!-- LEFT COLUMN: PRODUCT INVENTORY + SALES HISTORY -->
+            <div class="left-column">
+
+                <!-- PRODUCT INVENTORY -->
+                <div class="card card-table">
+                    <div class="card-header">
+                        <h2>Product Inventory</h2>
+                        <p class="card-subtitle">
+                            List of all cakes, pastries, and beverages available across branches.
+                        </p>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% if produk_list %}
+                                {% for p in produk_list %}
+                                    <tr>
+                                        <td>{{ p.nama_produk }}</td>
+                                        <td>{{ p.kategori }}</td>
+                                        <td>Rp {{ "{:,.0f}".format(p.harga or 0).replace(",", ".") }}</td>
+                                        <td>
+                                            {% if p.status_produk == 'aktif' %}
+                                                <span class="status-pill status-aktif">Active</span>
+                                            {% else %}
+                                                <span class="status-pill status-nonaktif">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if p.created_at %}
+                                                {{ p.created_at }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form class="inline-form"
+                                                method="POST"
+                                                action="{{ url_for('toggle_product_status', id_produk=p.id) }}">
+                                                <input type="hidden" name="current_status" value="{{ p.status_produk }}">
+                                                {% if p.status_produk == 'aktif' %}
+                                                    <button type="submit" class="btn-secondary btn-small btn-danger-outline">
+                                                        Deactivate
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit" class="btn-secondary btn-small">
+                                                        Activate
+                                                    </button>
+                                                {% endif %}
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="empty-row">
+                                        No products yet. Use the form on the right to add your first item.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SALES HISTORY (DI BAWAH PRODUCT INVENTORY) -->
+                <div class="card card-table sales-history-card" id="sales-history">
+                    <div class="card-header">
+                        <h2>Sales History</h2>
+                        <p class="card-subtitle">
+                            Track record penjualan harian per cabang & produk (maks 50 data terakhir).
+                        </p>
+                    </div>
+
+                    <!-- FILTER -->
+                    <form class="history-filter" method="get" action="{{ url_for('product_dashboard') }}#sales-history">
+                        <div class="filter-grid">
+
+                            <div class="form-group">
+                                <label>Branch</label>
+                                <select name="rec_branch_id">
+                                    <option value="">All branches</option>
+                                    {% for b in branch_list %}
+                                        <option value="{{ b.id }}" {% if rec_branch_id|string == b.id|string %}selected{% endif %}>
+                                            {{ b.nama_cabang }} ({{ b.kota }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Product</label>
+                                <select name="rec_product_id">
+                                    <option value="">All products</option>
+                                    {% for p in produk_list %}
+                                        <option value="{{ p.id }}" {% if rec_product_id|string == p.id|string %}selected{% endif %}>
+                                            {{ p.nama_produk }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date from</label>
+                                <input type="date" name="rec_date_from" value="{{ rec_date_from }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date to</label>
+                                <input type="date" name="rec_date_to" value="{{ rec_date_to }}">
+                            </div>
+
+                        </div>
+
+                        <div class="filter-actions">
+                            <button class="btn-primary btn-apply-filter" type="submit">Apply Filter</button>
+                            <a class="btn-secondary btn-reset-filter" href="{{ url_for('product_dashboard') }}#sales-history">Reset</a>
+                        </div>
+                    </form>
+
+                    <!-- SUMMARY KECIL -->
+                    <div class="history-summary">
+                        <div class="hs-item">
+                            <div class="hs-label">Total Qty</div>
+                            <div class="hs-value">{{ sales_history_total_qty or 0 }}</div>
+                        </div>
+                        <div class="hs-item">
+                            <div class="hs-label">Total Revenue</div>
+                            <div class="hs-value">
+                                Rp {{ '{:,.0f}'.format(sales_history_total_rev or 0).replace(',', '.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABLE -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Branch</th>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Revenue</th>
+                                    <th>Recorded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if sales_history and sales_history|length > 0 %}
+                                    {% for r in sales_history %}
+                                        <tr>
+                                            <td>{{ r.tanggal }}</td>
+                                            <td>
+                                                {{ r.nama_cabang }}
+                                                <br><span class="muted">{{ r.kota }}</span>
+                                            </td>
+                                            <td>
+                                                {{ r.nama_produk }}
+                                                <br><span class="muted">{{ r.kategori }}</span>
+                                            </td>
+                                            <td>{{ r.jumlah_terjual }}</td>
+                                            <td>Rp {{ '{:,.0f}'.format(r.pendapatan or 0).replace(',', '.') }}</td>
+                                            <td class="muted">{{ r.created_at }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="empty-row">No sales record found for the selected filter.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: FORMS (STACKED) -->
+            <div class="right-column">
+
+                <!-- FORM: ADD NEW PRODUCT -->
+                <div class="card card-form">
+                    <h2>Add New Product</h2>
+                    <p class="card-subtitle">
+                        Quickly register new items without touching phpMyAdmin.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('product_dashboard') }}">
+                        <input type="hidden" name="form_type" value="add_product">
+
+                        <div class="form-group">
+                            <label for="nama_produk">Product Name</label>
+                            <input type="text" id="nama_produk" name="nama_produk"
+                                   placeholder="Classic Chocolate Cake" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kategori">Category</label>
+                            <input type="text" id="kategori" name="kategori"
+                                   placeholder="Cake / Pastry / Beverage" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="harga">Price (IDR)</label>
+                            <input type="number" min="0" id="harga" name="harga"
+                                   placeholder="250000" required>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            Save Product
+                        </button>
+                    </form>
+
+                    {% if kategori_summary %}
+                        <div class="product-sales-summary">
+                            <p class="summary-label">By category:</p>
+
+                            <!-- PILL ROW (KIRI KE KANAN, WRAP RAPI) -->
+                            <div class="summary-tags">
+                                {% for k in kategori_summary %}
+                                    <span class="tag-pill">
+                                        {{ k.kategori }} · {{ k.jumlah }} item(s), {{ k.aktif_count }} active
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- FORM: DAILY PRODUCT SALES -->
+                <div class="card card-form">
+                    <h2>Daily Product Sales</h2>
+                    <p class="card-subtitle">
+                        Record how many units were sold per product each day.
+                    </p>
+
+                    <form method="POST" action="{{ url_for('add_product_sales') }}">
+                        <div class="form-group">
+                            <label for="id_cabang_sales">Branch</label>
+                            <select id="id_cabang_sales" name="id_cabang" required>
+                                <option value="">Select branch…</option>
+                                {% for b in branch_list %}
+                                    <option value="{{ b.id }}">
+                                        {{ b.nama_cabang }} ({{ b.kota }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_produk_sales">Product</label>
+                            <select id="id_produk_sales" name="id_produk" required>
+                                <option value="">Select product…</option>
+                                {% for p in produk_list %}
+                                    <option value="{{ p.id }}">{{ p.nama_produk }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tanggal_sales">Date</label>
+                            <input type="date" id="tanggal_sales" name="tanggal" required>
+                        </div>
+
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label for="jumlah_terjual">Quantity Sold</label>
+                                <input type="number" min="0" id="jumlah_terjual"
+                                       name="jumlah_terjual" placeholder="40">
+                            </div>
+                            <div class="form-group">
+                                <label for="pendapatan_total">Total Revenue (IDR)</label>
+                                <input type="number" min="0" id="pendapatan_total"
+                                       name="pendapatan_total" placeholder="1200000">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            Save Daily Sales
+                        </button>
+                    </form>
+
+                    <!-- SALES SUMMARY -->
+                    {% if sales_rows %}
+                        <div class="product-sales-summary">
+                            <p class="summary-label">Top products by sales:</p>
+                            <div class="table-wrapper mini-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Total Sold</th>
+                                            <th>Total Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for s in sales_rows %}
+                                            <tr>
+                                                <td>{{ s.nama_produk }}</td>
+                                                <td>{{ s.total_terjual }}</td>
+                                                <td>Rp {{ "{:,.0f}".format(s.total_pendapatan or 0).replace(",", ".") }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="empty">
+                            No product sales recorded yet. Start by logging sales for today.
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>
