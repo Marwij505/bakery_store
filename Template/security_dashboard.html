@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Security & Audit · HARMSTORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS khusus halaman security -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='security_dashboard.css') }}">
+</head>
+<body>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR KIRI (SAMA SEPERTI MENU LAIN) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-circle">HR</div>
+            <div class="brand-text">
+                <div class="brand-title">HARMSTORE</div>
+                <div class="brand-subtitle">Cake · Pastry · Coffee</div>
+            </div>
+        </div>
+        
+        <!-- My Profile (Coming Soon) - placed above "Signed in as" -->
+        <ul class="profile-shortcut">
+        <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='my_profile') }}">
+            My Profile <span class="soon-pill">Coming Soon</span>
+            </a>
+        </li>
+        </ul>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-label">Signed in as</div>
+            <div class="sidebar-user-name">{{ full_name or "Owner" }}</div>
+            <div class="sidebar-user-role">{{ role|capitalize }}</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-title">Executive Menu</div>
+            <ul>
+                <li class="menu-item {% if active_menu == 'overview' %}is-active{% endif %}">
+                    <a href="{{ url_for('owner_dashboard') }}">Executive Overview</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'branches' %}is-active{% endif %}">
+                    <a href="{{ url_for('branch_performance') }}">Branch Performance</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'products' %}is-active{% endif %}">
+                    <a href="{{ url_for('product_dashboard') }}">Product Insights</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'access' %}is-active{% endif %}">
+                    <a href="{{ url_for('access_control') }}">Access Control</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'security' %}is-active{% endif %}">
+                    <a href="{{ url_for('security_dashboard') }}">Security & Audit</a>
+                </li>
+            
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='approvals') }}">Approvals (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='finance') }}">Finance Overview (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='inventory') }}">Inventory Watch (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='announcements') }}">Announcements (Coming Soon)</a>
+                </li>
+</ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            <div class="sidebar-copy">© 2025 HARMSTORE · Owner Portal</div>
+        </div>
+    </aside>
+
+    <!-- KONTEN KANAN -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1 class="page-title">Security & Audit</h1>
+                <p class="page-subtitle">
+                    Pantau login/logout dan perubahan data penting (harga, role, approval, dll).
+                </p>
+            </div>
+        </header>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-wrapper">
+                    {% for category, msg in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- FILTERS -->
+        <section class="card card-filters">
+            <div class="card-header">
+                <h2>Filter</h2>
+                <p class="card-subtitle">Cari audit log berdasarkan user, aksi, status, dan rentang tanggal.</p>
+            </div>
+
+            <form class="filters-form" method="GET" action="{{ url_for('security_dashboard') }}">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label>User</label>
+                        <select name="user_id">
+                            <option value="">Semua User</option>
+                            {% for u in (users | default([])) %}
+                                <option value="{{ u.id }}" {% if (q_user_id|default('')|string) == (u.id|string) %}selected{% endif %}>
+                                    {{ u.employee_id }} · {{ u.full_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aksi</label>
+                        <select name="action">
+                            <option value="">Semua Aksi</option>
+                            {% for a in (action_options | default([])) %}
+                                <option value="{{ a }}" {% if (q_action|default('')) == a %}selected{% endif %}>
+                                    {{ a }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="">Semua Status</option>
+                            <option value="success" {% if (q_status|default('')) == 'success' %}selected{% endif %}>success</option>
+                            <option value="failed" {% if (q_status|default('')) == 'failed' %}selected{% endif %}>failed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dari Tanggal</label>
+                        <input type="date" name="date_from" value="{{ q_date_from|default('') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sampai Tanggal</label>
+                        <input type="date" name="date_to" value="{{ q_date_to|default('') }}">
+                    </div>
+                </div>
+
+                <div class="filters-actions">
+                    <button class="btn-primary btn-apply" type="submit">Terapkan</button>
+                    <a class="btn-secondary btn-reset" href="{{ url_for('security_dashboard') }}">Reset</a>
+                </div>
+            </form>
+        </section>
+
+        <!-- AUDIT TABLE -->
+        <section class="card card-table">
+            <div class="card-header">
+                <h2>Audit Logs</h2>
+                <p class="card-subtitle">Menampilkan data terbaru (urut waktu). Maks 400 baris.</p>
+            </div>
+
+            <div class="table-wrapper audit-table-wrapper">
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>IP</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in (logs | default([])) %}
+                            <tr>
+                                <td class="mono">{{ row.created_at }}</td>
+                                <td>
+                                    <div class="cell-stack">
+                                        <div class="strong">{{ row.employee_id or '-' }}</div>
+                                        <div class="mini dim">{{ row.full_name or '-' }}</div>
+                                    </div>
+                                </td>
+                                <td class="mono">{{ row.role or '-' }}</td>
+                                <td>
+                                    {% set st = (row.status or '')|lower %}
+                                    {% if st == 'success' %}
+                                        <span class="status-pill status-success">success</span>
+                                    {% elif st == 'failed' %}
+                                        <span class="status-pill status-failed">failed</span>
+                                    {% else %}
+                                        <span class="status-pill status-neutral">{{ row.status or '-' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="mono">{{ row.action or '-' }}</td>
+                                <td class="mono">{{ row.target_type or '-' }} : {{ row.target_id or '-' }}</td>
+                                <td class="mono">{{ row.ip_address or '-' }}</td>
+                                <td class="mono mini dim details-cell">{{ row.details or '-' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="empty-row">Belum ada audit logs.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>
