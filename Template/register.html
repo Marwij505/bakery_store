@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register • HARMSTORE Management / ADMIN Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Register CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- ================= LEFT HERO PANEL ================= -->
+    <aside class="hero-panel">
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                HARMSTORE MANAGEMENT / ADMIN · REGISTRATION
+            </div>
+
+            <div class="hero-logo-circle">HR</div>
+
+            <h1 class="hero-title">HARMSTORE</h1>
+            <p class="hero-subtitle">
+                Official registration portal for <strong>Managers</strong> and <strong>Administrators</strong> of HARMSTORE.  
+                Create a secure management account to oversee branches, products, and sales performance
+                across all regions.
+            </p>
+
+            <!-- MINI BAKERY GALLERY -->
+            <div class="hero-gallery">
+                <div class="hero-card">
+                    <img src="{{ url_for('static', filename='img/cake_hero_1.jpg') }}" alt="HARMSTORE Signature Cake">
+                    <div class="hero-card-caption">
+                        Centralized Branch Operations
+                    </div>
+                </div>
+
+                <div class="hero-card">
+                    <img src="{{ url_for('static', filename='img/croissant_hero.jpg') }}" alt="Fresh Croissant HARMSTORE">
+                    <div class="hero-card-caption">
+                        Freshly Baked Croissants
+                    </div>
+                </div>
+
+                <div class="hero-card">
+                    <img src="{{ url_for('static', filename='img/pastry_coffee.jpg') }}" alt="Pastry and Coffee Pairing">
+                    <div class="hero-card-caption">
+                        Pastry & Coffee Pairings
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-pill">🧁 100+ Cakes & Pastries</div>
+                <div class="stat-pill">🥐 Baked Fresh Daily</div>
+                <div class="stat-pill">☕ International Branch Network</div>
+            </div>
+        </div>
+
+        <div class="hero-footer">
+            © HARMSTORE Cake & Pastry · Internal Management / Admin Access Only
+        </div>
+    </aside>
+
+    <!-- ================= RIGHT REGISTER CARD ================= -->
+    <main class="login-panel">
+        <div class="login-card">
+            <div class="card-accent"></div>
+
+            <div class="login-header">
+                <div>
+                    <h2>Create Your Private Management / Admin Account </h2>
+                    <p>
+                        Please complete this form after you are authorised to be <strong>Manager</strong> or <strong>Administrator</strong> and congratulation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FLASH MESSAGES FROM FLASK -->
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    <div class="flash-wrapper">
+                        {% for category, msg in messages %}
+                            <div class="flash flash-{{ category }}">
+                                {{ msg }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- REGISTRATION FORM -->
+            <form method="POST" action="{{ url_for('register') }}" class="login-form">
+
+                 <!-- FULL NAME -->
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            placeholder="Input Your Full Name"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- PHONE NUMBER -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📱</span>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Input Your Phone Number"
+                        >
+                    </div>
+                </div>
+
+                <!-- NAMA AYAH & IBU DALAM 2 KOLOM -->
+                <div class="form-row-2col">
+                    <div class="form-group">
+                        <label for="father_name">Father Name</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🧔</span>
+                            <input
+                                type="text"
+                                id="father_name"
+                                name="father_name"
+                                placeholder="For Verfication"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mother_name">Mother Name</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👩</span>
+                            <input
+                                type="text"
+                                id="mother_name"
+                                name="mother_name"
+                                placeholder="For Verfication"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USERNAME -->
+                <div class="form-group">
+                    <label for="username">Username (ID Login)</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🆔</span>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Create Your Username"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create Your Password"
+                            required
+                        >
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="toggle-password"
+                            aria-label="Show password"
+                        >
+                            👁
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ROLE (MANAGER / ADMIN) -->
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🎯</span>
+                        <select id="role" name="role" required>
+                            <option value="">Pick Role</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- TOMBOL REGISTER -->
+                <button type="submit" class="btn-primary">
+                    <span>Create Account</span>
+                    <span class="btn-chevron">➜</span>
+                </button>
+            </form>
+
+            <div class="login-footer-note">
+                Already Have Account?
+                <a href="{{ url_for('login') }}" class="link-small highlight-link">
+                    Back to Login / Sign-In Page
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOGGLE PASSWORD SCRIPT -->
+<script>
+    const toggle = document.getElementById('togglePassword');
+    const pwd = document.getElementById('password');
+
+    if (toggle && pwd) {
+        toggle.addEventListener('click', () => {
+            const type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwd.setAttribute('type', type);
+            toggle.classList.toggle('active');
+        });
+    }
+</script>
+
+</body>
+</html>
