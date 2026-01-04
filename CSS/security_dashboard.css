@@ -1,0 +1,498 @@
+/* =====================================
+   SECURITY & AUDIT • GLOBAL THEME (SAMA DENGAN EXECUTIVE MENU)
+   ===================================== */
+
+/* Reset kecil */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body { height: 100%; }
+
+body {
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #5c3321;
+    background:
+        radial-gradient(circle at 0% 0%, #f8c8c4 0, transparent 80%),
+        radial-gradient(circle at 100% 100%, #f1a07a 0, transparent 60%),
+        radial-gradient(circle at 50% 120%, #f7b491 0, transparent 60%),
+        #f4b4e4;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LAYOUT ===== */
+.page-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== SIDEBAR – SAMA DENGAN OWNER / BRANCH / PRODUCT / ACCESS ===== */
+.sidebar {
+    width: 260px;
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    /* FIX: biar executive menu gak "ketarik" ke bawah */
+    justify-content: flex-start;
+    /* FIX: biar sidebar stay di atas saat scroll */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* opsional tapi enak: kalau isi sidebar kepanjangan, bisa scroll sendiri */
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f7c3bd, #f4a187);
+    box-shadow: 8px 0 24px rgba(163, 90, 59, 0.5);
+    color: #5c3321;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+.brand-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe9da, #f1a36d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: #5c3321;
+    box-shadow: 0 8px 16px rgba(120, 60, 30, 0.35);
+}
+
+.brand-title {
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:0.02em;
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+.sidebar-user {
+    margin-top: 8px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+.sidebar-user-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+}
+
+.sidebar-user-name {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+.sidebar-user-role {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.menu-title {
+    margin: 28px 0 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #fbe3da;
+    margin-bottom: 12px;
+}
+
+.sidebar-menu ul { list-style: none; }
+
+.menu-item { margin-bottom: 8px; }
+
+.menu-item a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #fde9df;
+    text-decoration: none;
+    transition: all 0.18s ease-out;
+}
+
+.menu-item a:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateX(2px);
+}
+
+.menu-item.is-active a {
+    background: #ffece4;
+    color: #a3384a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+    transform: translateX(0);
+}
+
+.sidebar-footer {
+    margin-top: auto; /* FIX: dorong logout ke bawah tapi menu tetap di atas */
+    padding-top: 18px;
+}
+
+.btn-logout {
+    display: block;
+    text-align: center;
+    padding: 11px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff7f3;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.18s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+
+.sidebar-copy {
+    margin-top: 14px;
+    font-size: 11px;
+    opacity: 0.85;
+    color: #fff1ea;
+    text-align: center;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    flex: 1;
+    padding: 32px 40px;
+    max-width: 1200px !important;  /* paksa sama biar tidak melebar/menyempit */
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+/* Top header */
+.top-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom: 18px;
+}
+
+.page-title{
+    font-size: 30px;
+    letter-spacing: .02em;
+    margin-bottom: 6px;
+}
+
+.page-subtitle{
+    font-size: 13px;
+    opacity: .9;
+}
+
+/* Flash */
+.flash-wrapper{
+    margin: 0 0 16px;
+}
+.flash{
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+.flash-success{ border-left: 6px solid #22c55e; }
+.flash-danger{ border-left: 6px solid #ef4444; }
+.flash-warning{ border-left: 6px solid #f59e0b; }
+
+/* Generic card */
+.card{
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 18px;
+}
+
+.card-header{
+    padding: 18px 22px 0;
+}
+
+.card-header h2{
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.card-subtitle{
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 14px;
+}
+
+/* Filters card */
+.card-filters{
+    padding-bottom: 16px;
+}
+
+.filters-form{
+    padding: 0 22px 18px;
+}
+
+.filters-grid{
+    display:grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    align-items:end;
+}
+
+.form-group label{
+    display:block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    opacity: .9;
+}
+
+.form-group select,
+.form-group input{
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    padding: 9px 11px;
+    font-size: 13px;
+    background: #fff9f6;
+}
+
+.filters-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+/* Buttons (match theme) */
+.btn-primary{
+    border: none;
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+    background: linear-gradient(120deg, #f0785f, #f3a45f);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.btn-secondary{
+    border: 1px solid rgba(0,0,0,0.10);
+    background: #fff;
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration:none;
+    color:#5c3321;
+    cursor:pointer;
+}
+
+/* Table */
+.card-table{
+    padding: 18px 22px 20px;
+}
+
+.table-wrapper{
+    margin-top: 4px;
+    border-radius: 18px;
+    background: #fff7f4;
+}
+
+.audit-table-wrapper{
+    overflow: auto;
+}
+
+.audit-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 1100px;
+}
+
+.audit-table thead{
+    background: #f7a67a;
+}
+
+.audit-table th, .audit-table td{
+    padding: 9px 15px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.audit-table tbody tr:nth-child(even){
+    background: rgba(255, 247, 243, 0.95);
+}
+
+.audit-table tbody tr:hover{
+    background: rgba(255, 230, 215, 0.9);
+}
+
+.empty-row{
+    text-align: center;
+    padding: 14px 0;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.cell-stack{ display:flex; flex-direction:column; line-height:1.15; }
+.mini{ font-size: 12px; }
+.dim{ opacity: .75; }
+.strong{ font-weight: 700; }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+.details-cell{
+    max-width: 520px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Status pill */
+.status-pill{
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.status-success{ background: #e3ffea; color: #1c6b39; }
+.status-failed{ background: #ffe1e5; color: #b0242f; }
+.status-neutral{ background: #f2f2f2; color: #444; }
+
+/* Responsive */
+@media (max-width: 980px){
+    .filters-grid{ grid-template-columns: 1fr 1fr; }
+    .filters-actions{ justify-content: stretch; }
+    .btn-primary, .btn-secondary{ width: 100%; text-align:center; }
+}
+
+@media (max-width: 780px){
+    .page-layout{ flex-direction: column; }
+    .sidebar{ width: 100%; border-radius: 0; box-shadow: none; }
+    .main-content{ padding: 22px 18px; }
+}
+
+
+/* ==============================
+   Coming Soon Menu Items
+   ============================== */
+.sidebar .menu-item.is-soon a{
+  opacity: 1 !important;
+  color : #efeaeab0 !important;
+}
+.sidebar .menu-item.is-soon a{
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* ===================================================
+FLASH / REMINDER (Coming Soon) - Konsisten di 5 menu
+==================================================== */
+.flash-wrap{
+  margin: 14px 0 18px;
+}
+
+.flash{
+  /* mengikuti font halaman (inherit) */
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.25;
+
+  /* bentuk & layout */
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+
+  /* gaya lembut seperti contoh */
+  background: rgba(220, 240, 255, 0.80);
+  border-left: 6px solid rgba(70, 160, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+}
+
+/* Variasi kategori flash (kalau nanti dipakai selain info) */
+.flash-success{
+  background: rgba(210, 255, 225, 0.75);
+  border-left-color: rgba(60, 190, 120, 0.95);
+}
+
+.flash-warning{
+  background: rgba(255, 240, 210, 0.78);
+  border-left-color: rgba(245, 165, 55, 0.95);
+}
+
+.flash-danger{
+  background: rgba(255, 215, 215, 0.78);
+  border-left-color: rgba(235, 90, 90, 0.95);
+}
+
+/* ==============================
+   My Profile Shortcut (Coming Soon)
+   ============================== */
+.profile-shortcut{
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 14px;
+}
+
+.profile-shortcut .menu-item{
+  margin-bottom: 0;
+}
+
+/* badge kecil "Coming Soon" (pill) */
+.profile-shortcut .soon-pill{
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff7f3;
+  opacity: 0.92;
+}
+
+.profile-shortcut .menu-item a:hover .soon-pill{
+  opacity: 1;
+}
+
+/* =========================================
+   NORMALIZER PATCH (anti nyentak antar page)
+   Taruh PALING BAWAH file CSS
+   ========================================= */
+html{
+  overflow-y: scroll;            /* lebih “nendang” daripada di body */
+  scrollbar-gutter: stable;      /* browser modern */
+}
+
+body{
+  overflow-x: hidden;            /* cegah geser horizontal tipis */
+}
