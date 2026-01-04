@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Executive Dashboard • HARMSTORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS khusus dashboard owner -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='owner_dashboard.css') }}">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- SIDEBAR / HEADER KIRI -->
+    <aside class="sidebar">
+        <div class="brand-pill">
+            <div class="brand-logo">HR</div>
+            <div>
+                <div class="brand-name">HARMSTORE</div>
+                <div class="brand-tagline">Cake • Pastry • Coffee</div>
+            </div>
+        </div>
+
+        <!-- My Profile (Coming Soon) - placed above "Signed in as" -->
+        <ul class="profile-shortcut">
+        <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='my_profile') }}">
+            My Profile <span class="soon-pill">Coming Soon</span>
+            </a>
+        </li>
+        </ul>
+
+        <div class="owner-info">
+            <div class="owner-label">Signed in as</div>
+            <div class="owner-name">{{ full_name or 'Owner' }}</div>
+            <div class="owner-role">{{ role|capitalize }}</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-title">Executive Menu</div>
+            <ul>
+                <li class="menu-item {% if active_menu == 'overview' %}is-active{% endif %}">
+                    <a href="{{ url_for('owner_dashboard') }}">Executive Overview</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'branches' %}is-active{% endif %}">
+                    <a href="{{ url_for('branch_performance') }}">Branch Performance</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'products' %}is-active{% endif %}">
+                    <a href="{{ url_for('product_dashboard') }}">Product Insights</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'access' %}is-active{% endif %}">
+                    <a href="{{ url_for('access_control') }}">Access Control</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'security' %}is-active{% endif %}">
+                    <a href="{{ url_for('security_dashboard') }}">Security & Audit</a>
+                </li>
+            
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='approvals') }}">Approvals (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='finance') }}">Finance Overview (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='inventory') }}">Inventory Watch (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='announcements') }}">Announcements (Coming Soon)</a>
+                </li>
+</ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            <p class="small-note">© 2025 HARMSTORE • Owner Portal</p>
+        </div>
+    </aside>
+
+    <!-- KONTEN UTAMA -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <div class="top-title">
+                <h1>Executive Overview</h1>
+                <p>Ringkasan performa harian cabang HARMSTORE di seluruh kota.</p>
+                <p class="top-note">
+                    Untuk kelola produk & stok, gunakan menu
+                    <a href="{{ url_for('product_dashboard') }}">Product Insights</a>.
+                </p>
+            </div>
+
+            <form class="filter-form" method="get" action="{{ url_for('owner_dashboard') }}">
+                <div class="filter-group">
+                    <label for="kota">Kota</label>
+                    <select name="kota" id="kota">
+                        <option value="">Semua kota</option>
+                        {% for kota in kota_list %}
+                            <option value="{{ kota }}" {% if kota == filter_kota %}selected{% endif %}>
+                                {{ kota }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="tanggal">Tanggal</label>
+                    <input type="date" name="tanggal" id="tanggal" value="{{ tanggal_filter }}">
+                </div>
+
+                <button type="submit" class="btn-filter">Terapkan</button>
+            </form>
+        </header>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-wrapper">
+                    {% for category, msg in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- STAT CARD -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Cabang</div>
+                <div class="stat-value">{{ summary.total_cabang or 0 }}</div>
+                <div class="stat-hint">Aktif dalam filter saat ini</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Total Pendapatan</div>
+                <div class="stat-value">
+                    Rp {{ "{:,.0f}".format(summary.total_pendapatan or 0).replace(",", ".") }}
+                </div>
+                <div class="stat-hint">Akumulasi semua cabang</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Total Pesanan</div>
+                <div class="stat-value">{{ summary.total_pesanan or 0 }}</div>
+                <div class="stat-hint">Dalam periode yang dipilih</div>
+            </div>
+        </section>
+
+        <!-- TABEL CABANG -->
+        <section class="card-section">
+            <div class="section-header">
+                <h2>Cabang & Pendapatan</h2>
+                <p>Daftar cabang yang cocok dengan filter kota & tanggal.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cabang</th>
+                            <th>Kota</th>
+                            <th>Tanggal</th>
+                            <th>Pendapatan</th>
+                            <th>Pesanan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if cabang_rows %}
+                            {% for row in cabang_rows %}
+                                <tr>
+                                    <td>{{ row.nama_cabang }}</td>
+                                    <td>{{ row.kota }}</td>
+                                    <td>
+                                        {% if row.tanggal %}
+                                            {{ row.tanggal }}
+                                        {% else %}
+                                            <span class="table-empty">Belum ada data</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        Rp {{ "{:,.0f}".format(row.total_pendapatan or 0).replace(",", ".") }}
+                                    </td>
+                                    
+<td>{{ row.total_pesanan or 0 }}</td>
+                                    <td class="cell-actions">
+                                        <button type="button"
+                                                class="btn-edit js-edit-branch"
+                                                title="Edit data cabang (fix typo)"
+                                                data-id="{{ row.id }}"
+                                                data-nama="{{ row.nama_cabang|e }}"
+                                                data-kota="{{ row.kota|e }}"
+                                                data-negara="{{ (row.negara or '')|e }}"
+                                                data-status="{{ (row.status_cabang or 'aktif')|e }}"
+                                                data-alamat="{{ (row.alamat_lengkap or '')|e }}"
+                                                data-tglbuka="{{ row.tanggal_buka if row.tanggal_buka else '' }}">
+                                            ✎ Cabang
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn-edit js-edit-sales"
+                                                title="Edit / input pendapatan & pesanan (anti-typo)"
+                                                data-id_cabang="{{ row.id }}"
+                                                data-tanggal="{{ row.tanggal if row.tanggal else '' }}"
+                                                data-default_tanggal="{{ tanggal_filter if tanggal_filter else '' }}"
+                                                data-pendapatan="{{ row.total_pendapatan or 0 }}"
+                                                data-pesanan="{{ row.total_pesanan or 0 }}"
+                                                data-laba="{{ row.laba_bersih or 0 }}">
+                                            ✎ Sales
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="table-empty">
+                                    Belum ada data untuk filter ini. Coba ubah kota / tanggal atau tambahkan data di bawah.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FORM INPUT SEDERHANA -->
+        <section class="forms-grid">
+
+            <!-- FORM CABANG -->
+            <div class="card-form">
+                <h3>Tambah Cabang</h3>
+                <p class="form-subtitle">
+                    Input sederhana tanpa kode rumit.  
+                    Cukup nama cabang & kota, sisanya opsional.
+                </p>
+
+                <form method="POST" action="{{ url_for('add_branch') }}">
+                    <div class="form-group">
+                        <label for="nama_cabang">Nama Cabang</label>
+                        <input type="text" id="nama_cabang" name="nama_cabang"
+                               placeholder="HARMSTORE Kelapa Gading" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kota_cabang">Kota</label>
+                        <input type="text" id="kota_cabang" name="kota"
+                               placeholder="Jakarta" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="negara">Negara</label>
+                        <input type="text" id="negara" name="negara" placeholder="Indonesia">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alamat_lengkap">Alamat Lengkap</label>
+                        <textarea id="alamat_lengkap" name="alamat_lengkap"
+                                  rows="2" placeholder="Jl. Contoh No. 123, Kelapa Gading"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal_buka">Tanggal Buka</label>
+                        <input type="date" id="tanggal_buka" name="tanggal_buka">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Simpan Cabang</button>
+                </form>
+            </div>
+
+            <!-- FORM PENJUALAN HARIAN -->
+            <div class="card-form">
+                <h3>Input Penjualan Harian</h3>
+                <p class="form-subtitle">
+                    Pilih cabang, lalu isi angka penjualan hari ini.
+                </p>
+
+                <form method="POST" action="{{ url_for('add_sales') }}">
+                    <div class="form-group">
+                        <label for="id_cabang">Cabang</label>
+                        <select id="id_cabang" name="id_cabang" required>
+                            <option value="">Pilih cabang…</option>
+                            {% for row in branches_master %}
+                                <option value="{{ row.id }}">
+                                    {{ row.nama_cabang }} ({{ row.kota }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal_sales">Tanggal</label>
+                        <input type="date" id="tanggal_sales" name="tanggal" required>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label for="total_pendapatan">Total Pendapatan (Rp)</label>
+                            <input type="number" min="0" id="total_pendapatan"
+                                   name="total_pendapatan" placeholder="15000000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="total_pesanan">Total Pesanan</label>
+                            <input type="number" min="0" id="total_pesanan"
+                                   name="total_pesanan" placeholder="320">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="laba_bersih">Laba Bersih (Rp)</label>
+                        <input type="number" min="0" id="laba_bersih"
+                               name="laba_bersih" placeholder="4500000">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Simpan Penjualan</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- DASHBOARD ALERTS PANEL -->
+        <section class="alerts-panel">
+            <div class="alerts-header">
+                <div>
+                    <h2>Dashboard Alerts</h2>
+                    <p class="alerts-subtitle">
+                        Ringkasan cepat kondisi cabang & penjualan harian.
+                    </p>
+                </div>
+                <span class="alerts-tag">Auto Insights</span>
+            </div>
+
+            {% if alerts %}
+                <ul class="alerts-list">
+                    {% for a in alerts %}
+                        <li class="alert-item alert-{{ a.level|default('info') }}">
+                            <div class="alert-icon">
+                                {% if a.level == "danger" %}
+                                    ⚠
+                                {% elif a.level == "warning" %}
+                                    ❗
+                                {% elif a.level == "success" %}
+                                    ✅
+                                {% else %}
+                                    ℹ
+                                {% endif %}
+                            </div>
+                            <div class="alert-body">
+                                <p class="alert-title">{{ a.title }}</p>
+                                {% if a.message %}
+                                    <p class="alert-message">{{ a.message }}</p>
+                                {% endif %}
+                                {% if a.meta %}
+                                    <p class="alert-meta">{{ a.meta }}</p>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <!-- State kalau belum ada alert dari backend -->
+                <div class="alerts-empty">
+                    <span class="alerts-empty-icon">🎉</span>
+                    <div class="alerts-empty-text">
+                        <p class="alerts-empty-title">Semua cabang dalam kondisi normal.</p>
+                        <p class="alerts-empty-subtitle">
+                            Belum ada alert penting hari ini. Tetap pantau tren penjualan dan cabang yang sibuk.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+    </main>
+</div>
+
+
+<!-- EDIT BRANCH MODAL -->
+<div class="modal-overlay" id="editBranchModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editBranchTitle">
+        <div class="modal-header">
+            <h3 id="editBranchTitle">Edit Data Cabang</h3>
+            <button type="button" class="modal-close" data-close aria-label="Close">✕</button>
+        </div>
+
+        <p class="modal-subtitle">
+            Gunakan untuk memperbaiki typo nama cabang / kota / detail cabang.
+            Perubahan ini mengubah data master di tabel <b>toko_cabang</b>.
+        </p>
+
+        <form method="POST" action="{{ url_for('edit_branch') }}" class="modal-form">
+            <input type="hidden" name="next" value="{{ request.full_path }}">
+            <input type="hidden" name="branch_id" id="edit_branch_id">
+
+            <div class="form-group">
+                <label for="edit_nama_cabang">Nama Cabang</label>
+                <input type="text" id="edit_nama_cabang" name="nama_cabang" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_kota">Kota</label>
+                <input type="text" id="edit_kota" name="kota" required>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="edit_negara">Negara</label>
+                    <input type="text" id="edit_negara" name="negara" placeholder="Indonesia">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_status">Status Cabang</label>
+                    <select id="edit_status" name="status_cabang">
+                        <option value="aktif">Aktif</option>
+                        <option value="tutup">Tutup</option>
+                        <option value="renovasi">Renovasi</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_alamat">Alamat Lengkap</label>
+                <textarea id="edit_alamat" name="alamat_lengkap" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_tanggal_buka">Tanggal Buka</label>
+                <input type="date" id="edit_tanggal_buka" name="tanggal_buka">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" data-close>Batal</button>
+                <button type="submit" class="btn-primary">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT SALES MODAL (anti-typo pendapatan / pesanan) -->
+<div class="modal-overlay" id="editSalesModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editSalesTitle">
+        <div class="modal-header">
+            <h3 id="editSalesTitle">Edit Penjualan Harian</h3>
+            <button type="button" class="modal-close" data-close-sales aria-label="Close">✕</button>
+        </div>
+
+        <p class="modal-subtitle">
+            Gunakan untuk memperbaiki <b>pendapatan</b> / <b>pesanan</b> jika ada typo input.
+            Perubahan ini mengubah data transaksi di tabel <b>penjualan_harian</b>.
+        </p>
+
+        <form method="POST" action="{{ url_for('edit_sales') }}" class="modal-form">
+            <input type="hidden" name="next" value="{{ request.full_path }}">
+            <input type="hidden" name="id_cabang" id="edit_sales_id_cabang">
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="edit_sales_tanggal">Tanggal</label>
+                    <input type="date" id="edit_sales_tanggal" name="tanggal" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_sales_pesanan">Total Pesanan</label>
+                    <input type="number" id="edit_sales_pesanan" name="total_pesanan" min="0" step="1" required>
+                </div>
+            </div>
+
+            <div class="form-group-inline">
+                <div class="form-group">
+                    <label for="edit_sales_pendapatan">Total Pendapatan (Rp)</label>
+                    <input type="number" id="edit_sales_pendapatan" name="total_pendapatan" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_sales_laba">Laba Bersih (opsional)</label>
+                    <input type="number" id="edit_sales_laba" name="laba_bersih" min="0" step="0.01" placeholder="0">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" data-close-sales>Batal</button>
+                <button type="submit" class="btn-primary">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('editBranchModal');
+    if (!modal) return;
+
+    const idEl = document.getElementById('edit_branch_id');
+    const namaEl = document.getElementById('edit_nama_cabang');
+    const kotaEl = document.getElementById('edit_kota');
+    const negaraEl = document.getElementById('edit_negara');
+    const statusEl = document.getElementById('edit_status');
+    const alamatEl = document.getElementById('edit_alamat');
+    const tglBukaEl = document.getElementById('edit_tanggal_buka');
+
+    function openModal(payload) {
+        idEl.value = payload.id || '';
+        namaEl.value = payload.nama || '';
+        kotaEl.value = payload.kota || '';
+        negaraEl.value = payload.negara || '';
+        statusEl.value = (payload.status || 'aktif').toLowerCase();
+        alamatEl.value = payload.alamat || '';
+        tglBukaEl.value = payload.tglbuka || '';
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        setTimeout(() => namaEl.focus(), 50);
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.querySelectorAll('.js-edit-branch').forEach(btn => {
+        btn.addEventListener('click', () => {
+            openModal({
+                id: btn.dataset.id,
+                nama: btn.dataset.nama,
+                kota: btn.dataset.kota,
+                negara: btn.dataset.negara,
+                status: btn.dataset.status,
+                alamat: btn.dataset.alamat,
+                tglbuka: btn.dataset.tglbuka
+            });
+        });
+    });
+
+    modal.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+})();
+
+(function () {
+    const modal = document.getElementById('editSalesModal');
+    if (!modal) return;
+
+    const idCabangEl = document.getElementById('edit_sales_id_cabang');
+    const tanggalEl = document.getElementById('edit_sales_tanggal');
+    const pendapatanEl = document.getElementById('edit_sales_pendapatan');
+    const pesananEl = document.getElementById('edit_sales_pesanan');
+    const labaEl = document.getElementById('edit_sales_laba');
+
+    function openModal(payload) {
+        idCabangEl.value = payload.id_cabang || '';
+        tanggalEl.value = payload.tanggal || '';
+        pendapatanEl.value = payload.pendapatan || 0;
+        pesananEl.value = payload.pesanan || 0;
+        labaEl.value = payload.laba || 0;
+
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        setTimeout(() => pendapatanEl.focus(), 50);
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.querySelectorAll('.js-edit-sales').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // ambil tanggal dari row -> default_tanggal -> input filter -> hari ini
+            const filterTanggalEl = document.getElementById('tanggal');
+            const today = new Date().toISOString().slice(0, 10);
+
+            const tanggal =
+            (btn.dataset.tanggal || '').trim() ||
+            (btn.dataset.default_tanggal || '').trim() ||
+            (filterTanggalEl ? (filterTanggalEl.value || '').trim() : '') ||
+            today;
+
+            openModal({
+            id_cabang: btn.dataset.id_cabang,
+            tanggal: tanggal,
+            pendapatan: btn.dataset.pendapatan,
+            pesanan: btn.dataset.pesanan,
+            laba: btn.dataset.laba
+            });
+        });
+        });
+
+    modal.querySelectorAll('[data-close-sales]').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+})();
+</script>
+
+</body>
+</html>
