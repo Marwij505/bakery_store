@@ -1,0 +1,577 @@
+/* =========================================
+   REGISTER PAGE - HARMSTORE
+   Tema pastel bakery, sama dengan halaman login
+   ========================================= */
+
+/* ========== GLOBAL RESET ========== */
+* {
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #9d6745;
+
+    /* pastel bakery background */
+    background:
+        radial-gradient(circle at 0% 0%, #e6a59e 0, transparent 90%),
+        radial-gradient(circle at 100% 100%, #aa6951 0, transparent 60%),
+        radial-gradient(circle at 50% 120%, #aa7551 0, transparent 60%),
+        #cc8e64;
+}
+
+/* (opsional) kalau mau background pelan bergerak */
+@keyframes bgFloat {
+    0%   { background-position: 0% 0%; }
+    50%  { background-position: 40% 60%; }
+    100% { background-position: 80% 0%; }
+}
+
+/* ========== LAYOUT UTAMA ========== */
+
+.page-wrapper {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* bubble dekorasi blur */
+.page-wrapper::before,
+.page-wrapper::after {
+    content: "";
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 999px;
+    filter: blur(80px);
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.page-wrapper::before {
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.9), transparent 60%);
+    top: -120px;
+    left: -80px;
+}
+
+.page-wrapper::after {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.85), transparent 60%);
+    bottom: -150px;
+    right: -40px;
+}
+
+/* ========== HERO KIRI (branding) ========== */
+
+.hero-panel {
+    position: relative;
+    flex: 1.25;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 34px 40px;
+    color: #fef8f4;
+    overflow: hidden;
+}
+
+/* overlay lembut di hero */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 228, 230, 0.75),
+        rgba(248, 187, 208, 0.75),
+        rgba(250, 214, 165, 0.7)
+    );
+    mix-blend-mode: soft-light;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes overlayShift {
+    0%   { transform: translate3d(-12px, 0, 0) scale(1.02); }
+    50%  { transform: translate3d(10px, 8px, 0) scale(1.04); }
+    100% { transform: translate3d(0, -10px, 0) scale(1.01); }
+}
+
+.hero-content {
+    position: relative;
+    max-width: 460px;
+    z-index: 1;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(107, 48, 22, 0.32);
+    border: 1px solid rgba(248, 187, 208, 0.7);
+    font-size: 11px;
+    margin-bottom: 14px;
+}
+
+.hero-badge .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: radial-gradient(circle, #22c55e, #15803d);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+}
+
+.hero-logo-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 22px;
+    color: #7a431e;
+    margin-bottom: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    animation: logoFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes logoFloat {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-7px); }
+}
+
+.hero-title {
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #7a1b4f;
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #ffffff;
+    max-width: 500px;
+    margin-top: 5px;
+}
+
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.stat-pill {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(247, 233, 224, 0.9);
+    border: 1px solid rgba(248, 187, 208, 0.7);
+    color: #8a4a2f;
+}
+
+.hero-footer {
+    position: relative;
+    font-size: 11px;
+    color: #000000;
+    opacity: 0.9;
+    z-index: 1;
+}
+
+/* ========== PANEL KANAN (card form) ========== */
+
+.login-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 28px;
+    z-index: 1;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: #fbd2d1;
+    border-radius: 26px;
+    padding: 28px 26px 24px;
+    box-shadow: 0 28px 80px rgba(188, 142, 92, 0.85);
+    border: 1px solid rgba(241, 174, 136, 0.8);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(18px);
+}
+
+/* highlight lembut di dalam card */
+.card-accent {
+    position: absolute;
+    inset: 0;
+    top: -50%;
+    background:
+        radial-gradient(circle at 10% 0%, rgba(255, 183, 178, 0.7), transparent 55%),
+        radial-gradient(circle at 90% 0%, rgba(249, 210, 169, 0.8), transparent 55%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* header di atas form */
+.login-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+    z-index: 1;
+}
+
+.login-header h2 {
+    margin: 0;
+    font-size: 25px;
+    color: #7a1b4f;
+}
+
+.login-header p {
+    margin: 4px 0 0 0;
+    font-size: 15px;
+    color: #ab7651;
+}
+
+/* ========== FLASH MESSAGE ========== */
+
+.flash-wrapper {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 10px;
+}
+
+.flash {
+    font-size: 12px;
+    padding: 9px 11px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.flash::before {
+    content: "⚠";
+    font-size: 14px;
+}
+
+.flash-success::before { content: "✅"; }
+.flash-info::before    { content: "ℹ"; }
+
+.flash-danger {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.9);
+    color: #fecaca;
+}
+
+.flash-success {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.9);
+    color: #bbf7d0;
+}
+
+.flash-info {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.9);
+    color: #bfdbfe;
+}
+
+/* ========== FORM REGISTER ========== */
+
+.login-form {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group label {
+    font-size: 12px;
+    color: #a86f46;
+    display: block;
+}
+
+/* Kalau di register ada 2 kolom (misal Nama Ayah / Ibu) */
+.form-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* wrapper input + icon (kalau pakai icon seperti 👤) */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* input, select, textarea */
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea,
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 9px 11px 9px 30px; /* kalau tanpa icon, bisa 9px 11px */
+    border-radius: 12px;
+    border: 1px solid #f4c8a8;
+    background-color: #fffdf8;
+    color: #5b342e;
+    font-size: 13px;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.1s ease;
+}
+
+.input-wrapper textarea,
+.form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.input-wrapper input::placeholder,
+.form-group input::placeholder {
+    color: #c28a5f;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus,
+.input-wrapper textarea:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f4a7b9;
+    box-shadow: 0 0 0 1px rgba(244, 167, 185, 0.7),
+                0 0 16px rgba(244, 167, 185, 0.4);
+    transform: translateY(-1px);
+}
+
+.input-icon {
+    position: absolute;
+    left: 9px;
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+/* toggle password (boleh dipakai juga di register) */
+.toggle-password {
+    position: absolute;
+    right: 8px;
+    padding: 3px 7px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: #b08877;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.toggle-password:hover {
+    background: rgba(250, 214, 195, 0.9);
+    color: #5b342e;
+    transform: translateY(-1px);
+}
+
+.toggle-password.active {
+    background: rgba(173, 232, 208, 0.6);
+    color: #276749;
+}
+
+/* helper row / text kecil di bawah form (kalau dipakai) */
+.form-helper-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #cc4f7b;
+}
+
+.remember-me input {
+    width: 13px;
+    height: 13px;
+}
+
+/* link kecil di bawah form */
+.link-small {
+    color: #bf6475;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-small:hover {
+    text-decoration: underline;
+}
+
+.disabled-link {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.highlight-link {
+    color: #cc4f7b;
+}
+
+/* tombol Register */
+.btn-primary {
+    margin-top: 18px;
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 999px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background-image: linear-gradient(135deg, #f28482, #f28482, #f6bd60);
+    color: #4b2e2a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition:
+        transform 0.1s ease-out,
+        box-shadow 0.15s ease-out,
+        filter 0.15s ease-out;
+    box-shadow: 0 14px 30px rgba(242, 132, 130, 0.5);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.04);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 18px 40px rgba(242, 132, 130, 0.6);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.99);
+    box-shadow: 0 8px 18px rgba(190, 111, 84, 0.7);
+}
+
+/* footer note */
+.login-footer-note {
+    position: relative;
+    z-index: 1;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #a86f40;
+    text-align: center;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 960px) {
+    .page-wrapper {
+        flex-direction: column;
+    }
+
+    .hero-panel {
+        flex: none;
+        min-height: 210px;
+        padding: 24px 22px;
+    }
+
+    .login-panel {
+        flex: none;
+        padding: 22px 16px 26px;
+    }
+
+    .hero-subtitle {
+        max-width: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .login-card {
+        padding: 22px 18px 18px;
+        border-radius: 22px;
+    }
+
+    .hero-title {
+        font-size: 26px;
+    }
+
+    .hero-logo-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+}
+
+/* ====== HERO GALLERY DI REGISTER ====== */
+.hero-gallery {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.hero-card {
+    background: rgba(255, 248, 244, 0.9);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 22px rgba(120, 53, 15, 0.25);
+    border: 1px solid rgba(248, 187, 208, 0.7);
+}
+
+.hero-card img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-card-caption {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 8px;
+    color: #7a3b1d;
+    text-align: center;
+}
+
+/* Kalau layar kecil, gallery jadi 2 kolom atau 1 kolom */
+@media (max-width: 960px) {
+    .hero-gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-gallery {
+        grid-template-columns: 1fr;
+    }
+}
