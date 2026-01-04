@@ -1,0 +1,614 @@
+/* =====================================
+   ACCESS CONTROL · HARMSTORE
+   (match executive theme)
+   ===================================== */
+
+/* Reset */
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #5c3321;
+  background:
+    radial-gradient(circle at 0% 0%, #f8c8c4 0, transparent 80%),
+    radial-gradient(circle at 100% 100%, #f1a07a 0, transparent 60%),
+    radial-gradient(circle at 50% 120%, #f7b491 0, transparent 60%),
+    #f4b4e4;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LAYOUT ===== */
+.page-layout{
+  display:flex;
+  min-height:100vh;
+}
+
+/* ===== SIDEBAR (shared) ===== */
+.sidebar{
+  width:260px;
+  padding:26px 22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+  background: linear-gradient(180deg, #f7c3bd, #f4a187);
+  box-shadow: 8px 0 24px rgba(163, 90, 59, 0.5);
+  color:#5c3321;
+}
+
+.sidebar-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:40px;
+}
+
+.brand-circle{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #ffe9da, #f1a36d);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:18px;
+  color:#5c3321;
+  box-shadow:0 8px 16px rgba(120, 60, 30, 0.35);
+}
+
+.brand-title{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:0.02em;
+}
+
+.brand-subtitle{
+  font-size:11px;
+  opacity:0.85;
+  margin-top:2px;
+}
+
+.sidebar-user{
+  margin-top:8px;
+  padding:16px;
+  border-radius:18px;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+.sidebar-user-label{
+  font-size:10px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  opacity:0.85;
+  margin-bottom:8px;
+}
+
+.sidebar-user-name{
+  font-size:18px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  line-height:1.2;
+}
+
+.sidebar-user-role{
+  margin-top:6px;
+  font-size:12px;
+  opacity:0.9;
+}
+
+.menu-title{
+  margin:28px 0 12px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.16em;
+  color:#fbe3da;
+}
+
+.sidebar-menu ul{ list-style:none; }
+.menu-item{ margin-bottom:8px; }
+
+.menu-item a {
+  display: block;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #fde9df;
+  text-decoration: none;
+  transition: all 0.18s ease-out;
+}
+
+.menu-item a:hover{
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(2px);
+}
+
+.menu-item.is-active a{
+  background:#ffece4;
+  color:#a3384a;
+  box-shadow:0 6px 20px rgba(0,0,0,0.14);
+  transform: translateX(0);
+}
+
+.sidebar-footer{
+  margin-top:auto;
+  padding-top:18px;
+}
+
+.btn-logout{
+  display:block;
+  text-align:center;
+  padding:11px 14px;
+  border-radius:999px;
+  background: rgba(255, 255, 255, 0.22);
+  color:#fff7f3;
+  text-decoration:none;
+  font-weight:600;
+  transition: all 0.18s ease;
+}
+
+.btn-logout:hover{
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.sidebar-copy{
+  margin-top:14px;
+  font-size:11px;
+  opacity:0.85;
+  color:#fff1ea;
+  text-align:center;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content{
+  flex: 1;
+  padding: 32px 40px;
+  max-width: 1200px !important;  /* paksa sama biar tidak melebar/menyempit */
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+.top-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.page-title{
+  font-size: 28px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #4a2b20;
+}
+
+.page-subtitle{
+  margin-top: 0;
+  max-width: 920px;
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* Flash */
+.flash-wrapper{ margin: 0 0 16px; }
+.flash{
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.10);
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.flash-success{ border-left: 6px solid #22c55e; }
+.flash-danger{ border-left: 6px solid #ef4444; }
+.flash-warning{ border-left: 6px solid #f59e0b; }
+.flash-info{ border-left: 6px solid #3b82f6; }
+
+/* ===== CARD ===== */
+.card{
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.12);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.card-header{
+  padding: 20px 22px 0;
+}
+
+.card-header h2{
+  font-size: 26px;
+  font-weight: 700;
+  color: #4a2b20;
+  margin-bottom: 6px;
+}
+
+.card-subtitle{
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.55;
+  padding-bottom: 14px;
+}
+
+/* ===== OTP (ditampilkan 1x) ===== */
+.card-otp .card-header{ padding-bottom: 4px; }
+.otp-box{
+  padding: 16px 22px 20px;
+  background: rgba(255, 246, 240, 0.75);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.otp-meta{ display: grid; gap: 10px; }
+
+.otp-row{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.otp-label{
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 110px;
+  color: #4a2b20;
+  opacity: 0.9;
+}
+
+.otp-value{
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.otp-note{
+  margin-top: 12px;
+  font-size: 12px;
+  opacity: 0.9;
+  line-height: 1.55;
+}
+
+/* ===== TABLE ===== */
+.card-table{ padding-bottom: 18px; }
+
+.table-wrapper{
+  width: 100%;
+  overflow-x: auto;     /* hanya horizontal */
+  overflow-y: hidden;
+  padding: 0 22px 22px; /* lebih rapih */
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrapper.user-scroll{
+  border-radius: 18px;
+}
+
+/* turunin min-width biar ga “maksa” kebesaran */
+.table{
+  width: 150%;
+  min-width: 980px;     /* dari 1080 -> 980 */
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255,255,255,0.70);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* Aksi jangan turun baris biar rapi */
+.cell-actions{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap: nowrap;    /* penting */
+}
+
+.table thead th{
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a2b20;
+  background: linear-gradient(90deg, #f6b27b, #f2a071);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table tbody td{
+  padding: 14px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  vertical-align: middle;
+}
+
+.table tbody tr:nth-child(even){
+  background: rgba(255, 240, 232, 0.55);
+}
+
+.cell-actions{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  flex-wrap: wrap;
+}
+
+.inline-form{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12.5px;
+}
+
+.dim{ opacity: 0.85; }
+.stack{ display:grid; gap: 4px; }
+.mini{ font-size: 11px; opacity: 0.9; }
+
+/* Role select (mini) */
+.mini-select{
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.88);
+  outline: none;
+}
+
+/* Badges */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.badge-success{
+  background: #c8f7d6;
+  color: #1f6a38;
+}
+
+.badge-muted{
+  background: #ffd1d1;
+  color: #8b1d1d;
+}
+
+/* Mini buttons (table + otp copy) */
+.btn-mini{
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.72);
+  cursor: pointer;
+  font-weight: 700;
+  color: #4a2b20;
+  transition: transform 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-mini:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.85);
+}
+
+.btn-warn{
+  background: #ffd89a;
+  border-color: rgba(130, 70, 20, 0.12);
+}
+
+.btn-danger{
+  background: #ffb1b1;
+  border-color: rgba(120, 10, 10, 0.12);
+}
+
+/* ===== FORMS (Create/Edit) ===== */
+.grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.form{
+  padding: 0 22px 22px;
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.form-group{
+  display:grid;
+  gap: 8px;
+}
+
+label{
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+input, select{
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.90);
+  outline: none;
+}
+
+input:focus, select:focus{
+  border-color: rgba(163, 56, 74, 0.35);
+  box-shadow: 0 0 0 4px rgba(255, 236, 228, 0.9);
+}
+
+/* Primary CTA */
+.btn-primary{
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f57f57, #f2b36f);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(120, 50, 20, 0.18);
+  transition: transform 0.15s ease;
+  margin-top: 14px;
+}
+
+.btn-primary:hover{ transform: translateY(-1px); }
+
+/* Responsive */
+@media (max-width: 1100px){
+  .page-title{ font-size: 36px; }
+}
+
+@media (max-width: 980px){
+  .page-layout{ flex-direction: column; }
+  .sidebar{
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .main-content{ padding: 22px; }
+  .grid-2{ grid-template-columns: 1fr; }
+  .form-row{ grid-template-columns: 1fr; }
+  .table{ min-width: 860px; }
+}
+
+@media (max-width: 520px){
+  /* Mobile: jangan dipotong jadi 'Executive Over...' */
+  .menu-item a{
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.2;
+  }
+}
+
+/* ==============================
+   Coming Soon Menu Items
+   ============================== */
+.sidebar .menu-item.is-soon a{
+  opacity: 1 !important;
+  color : #efeaeab0 !important;
+}
+.sidebar .menu-item.is-soon a{
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* ===================================================
+FLASH / REMINDER (Coming Soon) - Konsisten di 5 menu
+==================================================== */
+.flash-wrap{
+  margin: 14px 0 18px;
+}
+
+.flash{
+  /* mengikuti font halaman (inherit) */
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.25;
+
+  /* bentuk & layout */
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+
+  /* gaya lembut seperti contoh */
+  background: rgba(220, 240, 255, 0.80);
+  border-left: 6px solid rgba(70, 160, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+}
+
+/* Variasi kategori flash (kalau nanti dipakai selain info) */
+.flash-success{
+  background: rgba(210, 255, 225, 0.75);
+  border-left-color: rgba(60, 190, 120, 0.95);
+}
+
+.flash-warning{
+  background: rgba(255, 240, 210, 0.78);
+  border-left-color: rgba(245, 165, 55, 0.95);
+}
+
+.flash-danger{
+  background: rgba(255, 215, 215, 0.78);
+  border-left-color: rgba(235, 90, 90, 0.95);
+}
+
+/* ==============================
+   My Profile Shortcut (Coming Soon)
+   ============================== */
+.profile-shortcut{
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 14px;
+}
+
+.profile-shortcut .menu-item{
+  margin-bottom: 0;
+}
+
+/* badge kecil "Coming Soon" (pill) */
+.profile-shortcut .soon-pill{
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff7f3;
+  opacity: 0.92;
+}
+
+.profile-shortcut .menu-item a:hover .soon-pill{
+  opacity: 1;
+}
+
+/* =========================================
+   NORMALIZER PATCH (anti nyentak antar page)
+   Taruh PALING BAWAH file CSS
+   ========================================= */
+html{
+  overflow-y: scroll;            /* lebih “nendang” daripada di body */
+  scrollbar-gutter: stable;      /* browser modern */
+}
+
+body{
+  overflow-x: hidden;            /* cegah geser horizontal tipis */
+}
