@@ -1,0 +1,953 @@
+/* =====================================
+   BRANCH PERFORMANCE • STYLING
+   ===================================== */
+/* Reset kecil */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #5c3321;
+  background:
+    radial-gradient(circle at 0% 0%, #f8c8c4 0, transparent 80%),
+    radial-gradient(circle at 100% 100%, #f1a07a 0, transparent 60%),
+    radial-gradient(circle at 50% 120%, #f7b491 0, transparent 60%),#f4b4e4;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LAYOUT ===== */
+.page-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== SIDEBAR – SAMA DENGAN OWNER / BRANCH / PRODUCT / ACCESS ===== */
+.sidebar {
+    width: 260px;
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    /* FIX: biar executive menu gak "ketarik" ke bawah */
+    justify-content: flex-start;
+    /* FIX: biar sidebar stay di atas saat scroll */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* opsional tapi enak: kalau isi sidebar kepanjangan, bisa scroll sendiri */
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f7c3bd, #f4a187);
+    box-shadow: 8px 0 24px rgba(163, 90, 59, 0.5);
+    color: #5c3321;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+.brand-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe9da, #f1a36d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: #5c3321;
+    box-shadow: 0 8px 16px rgba(120, 60, 30, 0.35);
+}
+
+.brand-title {
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:0.02em;
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+.sidebar-user {
+    margin-top: 8px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+.sidebar-user-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+}
+
+.sidebar-user-name {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+.sidebar-user-role {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.menu-title {
+    margin: 28px 0 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #fbe3da;
+    margin-bottom: 12px;
+}
+
+.sidebar-menu ul { list-style: none; }
+
+.menu-item { margin-bottom: 8px; }
+
+.menu-item a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #fde9df;
+    text-decoration: none;
+    transition: all 0.18s ease-out;
+}
+
+.menu-item a:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateX(2px);
+}
+
+.menu-item.is-active a {
+    background: #ffece4;
+    color: #a3384a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+    transform: translateX(0);
+}
+
+.sidebar-footer {
+    margin-top: auto; /* FIX: dorong logout ke bawah tapi menu tetap di atas */
+    padding-top: 18px;
+}
+
+.btn-logout {
+    display: block;
+    text-align: center;
+    padding: 11px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff7f3;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.18s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+
+.sidebar-copy {
+    margin-top: 14px;
+    font-size: 11px;
+    opacity: 0.85;
+    color: #fff1ea;
+    text-align: center;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content{
+  flex: 1;
+  padding: 32px 40px;
+  max-width: 1200px !important;  /* paksa sama biar tidak melebar/menyempit */
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+/* ===== HEADER ===== */
+.top-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:24px;
+  margin-bottom:18px;
+}
+.page-title{ font-size:30px; margin-bottom:6px; letter-spacing: .02em; }
+.page-subtitle{ font-size:13px; opacity:.9; max-width:680px; }
+
+/* ===== FILTERS ===== */
+.filters{
+  width:100%;
+  max-width:760px;
+  margin-left:auto;
+
+  border-radius:22px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 14px 32px rgba(0,0,0,.09);
+  padding:16px 16px 14px;
+}
+
+.filters-grid{
+  display:grid;
+  grid-template-columns: 1.25fr 1.25fr 1fr 1.1fr;
+  gap:12px;
+  align-items:end;
+}
+
+.filters .fg,
+.filters-grid > *{ min-width:0; }
+
+.filters .fg label{
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.8;
+  display:block;
+  margin-bottom:6px;
+  white-space:nowrap;
+}
+
+.filters select,
+.filters input[type="date"]{
+  width:100%;
+  border:none;
+  border-radius:999px;
+  padding:10px 12px;
+  background:#fff9f6;
+  font-size:13px;
+  color:#5c3321;
+  outline:none;
+
+  /* cegah kepotong */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  max-width:100%;
+}
+
+.filters-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:12px;
+}
+.btn-apply{
+  border:none;
+  border-radius:999px;
+  padding:10px 18px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(120deg, #f0785f, #f3a45f);
+  color:#fff;
+  box-shadow:0 10px 26px rgba(0,0,0,.18);
+}
+.btn-reset{
+  text-decoration:none;
+  border-radius:999px;
+  padding:10px 16px;
+  font-weight:600;
+  color:#5c3321;
+  background:#fff;
+  border:1px solid rgba(92,51,33,.18);
+}
+
+/* ===== FLASH ===== */
+.flash-wrapper{ margin-bottom:18px; }
+.flash{
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:13px;
+  margin-bottom:6px;
+}
+.flash-success{ background:#e4ffef; color:#226b3a; }
+.flash-danger{ background:#ffe4e6; color:#b4232c; }
+
+/* ===== SUMMARY CARDS ===== */
+.cards-row{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:18px;
+  margin:18px 0 22px;
+}
+.summary-card{
+  padding:18px 20px;
+  border-radius:22px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 14px 32px rgba(0,0,0,.09);
+}
+.summary-label{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  opacity:.75;
+  margin-bottom:6px;
+}
+.summary-value{ font-size:22px; font-weight:700; margin-bottom:4px; }
+.summary-meta{ font-size:11px; opacity:.85; }
+
+/* ===== CONTENT GRID =====
+   - 2 kolom supaya ada slot kanan kosong
+   - card-table span 2 kolom (full width)
+   - card-detail turun ke bawah dan hanya pakai kolom kiri
+*/
+.content-row{
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap:22px;
+  align-items:start;
+}
+
+/* Generic card */
+.card{
+  border-radius:22px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 16px 40px rgba(0,0,0,.10);
+}
+
+/* ===== LEFT (FULL WIDTH): RANKING TABLE CARD ===== */
+.card-table{
+  padding:20px 22px 18px;
+
+  /* full width like Executive table */
+  grid-column: 1 / -1;
+}
+
+.card-header h2{ font-size:20px; margin-bottom:4px; }
+.card-subtitle{ font-size:12px; opacity:.9; margin-bottom:14px; }
+
+/* wrapper: allow tiny scroll only if needed, no overflow beyond 100% */
+.card-table .table-wrapper{
+  margin-top:6px;
+  border-radius:18px;
+  background:#fff7f4;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter: stable both-edges;
+  max-width:100%;
+}
+
+/* IMPORTANT: remove hard min-width that caused "kelebaran" */
+.card-table table{
+  width:100%;
+  max-width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+
+  /* allow table to shrink to container */
+  min-width:0;
+}
+
+/* header */
+thead{ background:#f7a67a; }
+
+th, td{
+  padding:10px 14px;
+  text-align:left;
+  vertical-align:middle;
+  white-space:nowrap; /* keep your row spacing/visual tidy */
+}
+
+/* zebra + hover */
+tbody tr:nth-child(even){ background:rgba(255,247,243,.95); }
+tbody tr:hover{ background:rgba(255,230,215,.9); }
+
+.empty-row{
+  text-align:center;
+  padding:14px 0;
+  font-size:13px;
+  opacity:.85;
+}
+
+/* Selected row */
+tr.is-selected{
+  outline:2px solid rgba(243,164,95,.45);
+  outline-offset:-2px;
+}
+
+/* helpers */
+.muted{ opacity:.75; font-size:12px; }
+.cell-strong{ font-weight:700; }
+.pos{ color:#0a7b41; font-weight:700; }
+.neg{ color:#b4232c; font-weight:700; }
+
+/* table hint */
+.table-hint{ margin-top:10px; font-size:12px; }
+
+/* Custom scrollbar (ranking only) */
+.card-table .table-wrapper::-webkit-scrollbar{ height:10px; }
+.card-table .table-wrapper::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.55);
+  border-radius:999px;
+}
+.card-table .table-wrapper::-webkit-scrollbar-thumb{
+  background:rgba(243,164,95,.85);
+  border-radius:999px;
+}
+
+/* ===== ACTION CELL (Open detail + 3 tombol) ===== */
+.action-cell{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.btn-open-detail,
+.btn-view{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:999px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:700;
+  color:#3c241c;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.12);
+  line-height:1;
+  white-space:nowrap;
+  transition:transform .08s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn-open-detail:hover,
+.btn-view:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(0,0,0,.08);
+}
+
+/* status action buttons wrapper */
+.inline-form{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.inline-form form{ margin:0; }
+
+/* base button */
+.btn-secondary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  cursor:pointer;
+  line-height:1;
+  font-weight:800;
+  padding:8px 12px;
+  border:1px solid rgba(0,0,0,.12);
+  background:#fff;
+  color:#3c241c;
+  -webkit-appearance:none;
+  appearance:none;
+  transition:transform .08s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+}
+.btn-secondary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(0,0,0,.08);
+}
+.btn-small{ font-size:12px; }
+
+/* outlines */
+.btn-success-outline{ border-color:#48c774; color:#0b6b33; }
+.btn-danger-outline{ border-color:#ff6b6b; color:#b42318; }
+.btn-warn-outline{ border-color:#f6c453; color:#7a5b00; }
+
+.btn-success-outline:hover{ box-shadow:0 10px 22px rgba(72,199,116,.18); }
+.btn-danger-outline:hover{ box-shadow:0 10px 22px rgba(255,107,107,.18); }
+.btn-warn-outline:hover{ box-shadow:0 10px 22px rgba(246,196,83,.20); }
+
+/* selected solid by status (important) */
+.btn-success-outline.is-current{
+  background:linear-gradient(90deg, #34d399, #16a34a) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+.btn-danger-outline.is-current{
+  background:linear-gradient(90deg, #ff5a5f, #e11d48) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+.btn-warn-outline.is-current{
+  background:linear-gradient(90deg, #f6c453, #f59e0b) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+
+/* ===== RIGHT (BELOW, LEFT SLOT): DETAIL CARD ===== */
+.card-detail{
+  padding:20px 22px 18px;
+
+  /* move below ranking and keep left */
+  grid-column: 1 / 2;
+}
+
+/* detail header */
+.detail-header{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+.detail-subtitle{ font-size:12px; opacity:.9; }
+
+.detail-picker{
+  min-width:220px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:flex-start;
+}
+.detail-picker label{
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.detail-picker select{
+  width:100%;
+  border:none;
+  border-radius:999px;
+  padding:10px 12px;
+  background:#fff9f6;
+  font-size:13px;
+  outline:none;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.detail-empty{
+  padding:18px 16px;
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+}
+
+.detail-top{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+
+.mini{
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+  padding:14px;
+}
+.mini-label{
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.75;
+  margin-bottom:6px;
+}
+.mini-value{
+  font-size:18px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+/* status pill (detail) */
+.status-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  line-height:1;
+  border:1px solid rgba(0,0,0,.06);
+}
+.status-aktif{ background:#e8fff0; color:#0b6b33; }
+.status-tutup,
+.status-nonaktif{ background:#ffe8e8; color:#b42318; }
+.status-renovasi{ background:#fff7db; color:#7a5b00; }
+
+/* chart card */
+.chart-card{
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+  padding:14px;
+}
+.chart-title{ font-weight:800; margin-bottom:10px; }
+.chart{ display:flex; flex-direction:column; gap:10px; }
+.chart-row{
+  display:grid;
+  grid-template-columns: 72px 1fr 110px;
+  gap:10px;
+  align-items:center;
+}
+.chart-label{ font-size:12px; opacity:.85; }
+.chart-bar-outer{
+  height:10px;
+  border-radius:999px;
+  background:rgba(243,164,95,.25);
+  overflow:hidden;
+}
+.chart-bar-inner{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(120deg, #f0785f, #f3a45f);
+}
+.chart-value{ font-size:12px; font-weight:700; text-align:right; }
+
+/* top products */
+.mini-table{
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+  padding:14px;
+}
+.mini-table-title{ font-weight:800; margin-bottom:10px; }
+
+/* peak hour */
+.peak-card{
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+  padding:14px;
+}
+.peak-title{ font-weight:800; margin-bottom:6px; }
+.peak-note{ font-size:12px; }
+
+/* prevent scrolling in mini tables */
+.card-detail .table-wrapper,
+.mini-table .table-wrapper{
+  overflow:hidden !important;
+}
+
+/* =======================================================
+   FIX WARNA TOMBOL ACTION (tanpa ubah HTML)
+   Target: tombol dalam form toggle-status berdasarkan value
+   ======================================================= */
+/* Base tombol di area Action biar jadi pill */
+td form[action*="toggle-status"] button,
+td form[action*="toggle-status"] input[type="submit"]{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.12);
+  color:#3c241c;
+  -webkit-appearance:none;
+  appearance:none;
+  transition:transform .08s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+}
+
+td form[action*="toggle-status"] button:hover,
+td form[action*="toggle-status"] input[type="submit"]:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(0,0,0,.08);
+}
+
+/* Outline colors by VALUE (aktif/tutup/renovasi) */
+td form[action*="toggle-status"] button[value="aktif"],
+td form[action*="toggle-status"] input[type="submit"][value="aktif"]{
+  border-color:#48c774;
+  color:#0b6b33;
+}
+
+td form[action*="toggle-status"] button[value="tutup"],
+td form[action*="toggle-status"] input[type="submit"][value="tutup"]{
+  border-color:#ff6b6b;
+  color:#b42318;
+}
+
+td form[action*="toggle-status"] button[value="renovasi"],
+td form[action*="toggle-status"] input[type="submit"][value="renovasi"]{
+  border-color:#f6c453;
+  color:#7a5b00;
+}
+
+/* SOLID ketika tombol status saat ini (is-current masih dipakai) */
+td form[action*="toggle-status"] button.is-current[value="aktif"],
+td form[action*="toggle-status"] input[type="submit"].is-current[value="aktif"]{
+  background:linear-gradient(90deg, #34d399, #16a34a) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+
+td form[action*="toggle-status"] button.is-current[value="tutup"],
+td form[action*="toggle-status"] input[type="submit"].is-current[value="tutup"]{
+  background:linear-gradient(90deg, #ff5a5f, #e11d48) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+
+td form[action*="toggle-status"] button.is-current[value="renovasi"],
+td form[action*="toggle-status"] input[type="submit"].is-current[value="renovasi"]{
+  background:linear-gradient(90deg, #f6c453, #f59e0b) !important;
+  border-color:transparent !important;
+  color:#fff !important;
+}
+
+/* Kalau tombol jadi kotak karena user-agent default, paksa reset */
+td form[action*="toggle-status"] button{
+  border-style:solid;
+  outline:none;
+}
+
+/* ==========================
+   BRANCH STATUS CARD (NEW)
+   Tidak mengubah style lama, hanya tambahan layout & list.
+   ========================== */
+
+/* (Optional helper) kalau kamu pakai wrapper khusus */
+.detail-row{
+  display:grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap:22px;
+  align-items:start;
+  margin-top:22px;
+}
+
+.card-status{
+  padding:20px 22px 18px;
+
+  /* ========= FIX UTAMA =========
+     Pastikan Branch Status nongol di kolom kanan
+     walaupun HTML-nya ikut kebawa class "card-detail"
+     ============================ */
+  grid-column: 2 / 3;
+}
+
+/* kalau HTML kamu menulis: class="card card-detail card-status"
+   ini override paksa agar tidak ketarik ke kolom kiri */
+.card-detail.card-status{
+  grid-column: 2 / 3;
+}
+
+.status-summary{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap:12px;
+  margin:12px 0 14px;
+}
+
+.status-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.status-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:12px 12px;
+  border-radius:18px;
+  background:#fff7f4;
+  border:1px solid rgba(92,51,33,.10);
+}
+
+.status-left{
+  min-width:0;
+}
+
+.status-branch{
+  font-weight:800;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:240px;
+}
+
+.status-right{
+  flex:0 0 auto;
+}
+
+.status-note{
+  margin-top:12px;
+}
+
+/* kalau belum ada class ini di CSS kamu, ini hanya memastikan "Tutup" merah */
+.status-tutup{
+  background:#ffe8e8;
+  color:#b42318;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px){
+  .top-header{ flex-direction:column; }
+  .filters{
+    max-width:100%;
+    margin-left:0;
+  }
+  .filters-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+  /* on smaller screens: stack detail full width (no empty right) */
+  .content-row{ grid-template-columns: 1fr; }
+  .card-table{ grid-column: 1 / -1; }
+  .card-detail{ grid-column: 1 / -1; }
+
+  /* ========= FIX RESPONSIVE =========
+     Branch Status ikut full width kalau 1 kolom
+     ================================ */
+  .card-status,
+  .card-detail.card-status{
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 780px){
+  .page-layout{ flex-direction:column; }
+
+  .sidebar{
+    width:100%;
+    flex-direction:row;
+    padding:18px 20px;
+    align-items:center;
+    gap:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+  }
+
+  .sidebar-menu{ display:flex; flex-direction:column; align-items:flex-end; }
+  .sidebar-menu ul{ display:flex; gap:8px; }
+
+  .main-content{ padding:20px 18px 28px; }
+  .cards-row{ grid-template-columns:1fr; }
+  .detail-top{ grid-template-columns:1fr; }
+}
+
+/* Responsive: kalau layar mengecil, status card turun ke bawah */
+@media (max-width: 1024px){
+  .detail-row{
+    grid-template-columns:1fr;
+  }
+  .status-branch{
+    max-width:100%;
+  }
+}
+
+/* ==============================
+   Coming Soon Menu Items
+   ============================== */
+.sidebar .menu-item.is-soon a{
+  opacity: 1 !important;
+  color : #efeaeab0 !important;
+}
+.sidebar .menu-item.is-soon a{
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* ===================================================
+FLASH / REMINDER (Coming Soon) - Konsisten di 5 menu
+==================================================== */
+.flash-wrap{
+  margin: 14px 0 18px;
+}
+
+.flash{
+  /* mengikuti font halaman (inherit) */
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.25;
+
+  /* bentuk & layout */
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+
+  /* gaya lembut seperti contoh */
+  background: rgba(220, 240, 255, 0.80);
+  border-left: 6px solid rgba(70, 160, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+}
+
+/* Variasi kategori flash (kalau nanti dipakai selain info) */
+.flash-success{
+  background: rgba(210, 255, 225, 0.75);
+  border-left-color: rgba(60, 190, 120, 0.95);
+}
+
+.flash-warning{
+  background: rgba(255, 240, 210, 0.78);
+  border-left-color: rgba(245, 165, 55, 0.95);
+}
+
+.flash-danger{
+  background: rgba(255, 215, 215, 0.78);
+  border-left-color: rgba(235, 90, 90, 0.95);
+}
+
+/* ==============================
+   My Profile Shortcut (Coming Soon)
+   ============================== */
+.profile-shortcut{
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 14px;
+}
+
+.profile-shortcut .menu-item{
+  margin-bottom: 0;
+}
+
+/* badge kecil "Coming Soon" (pill) */
+.profile-shortcut .soon-pill{
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff7f3;
+  opacity: 0.92;
+}
+
+.profile-shortcut .menu-item a:hover .soon-pill{
+  opacity: 1;
+}
+
+/* =========================================
+   NORMALIZER PATCH (anti nyentak antar page)
+   Taruh PALING BAWAH file CSS
+   ========================================= */
+html{
+  overflow-y: scroll;            /* lebih “nendang” daripada di body */
+  scrollbar-gutter: stable;      /* browser modern */
+}
+
+body{
+  overflow-x: hidden;            /* cegah geser horizontal tipis */
+}
