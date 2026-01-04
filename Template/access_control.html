@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Access Control · HARMSTORE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS khusus halaman access -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='access_control.css') }}">
+</head>
+<body>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR (SAMA PERSIS DENGAN SECURITY/PRODUCT) -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-circle">HR</div>
+            <div class="brand-text">
+                <div class="brand-title">HARMSTORE</div>
+                <div class="brand-subtitle">Cake · Pastry · Coffee</div>
+            </div>
+        </div>
+
+        <!-- My Profile (Coming Soon) - placed above "Signed in as" -->
+        <ul class="profile-shortcut">
+        <li class="menu-item is-soon">
+            <a href="{{ url_for('coming_soon', feature='my_profile') }}">
+            My Profile <span class="soon-pill">Coming Soon</span>
+            </a>
+        </li>
+        </ul>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-label">Signed in as</div>
+            <div class="sidebar-user-name">{{ full_name or "Owner" }}</div>
+            <div class="sidebar-user-role">{{ role|capitalize }}</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-title">Executive Menu</div>
+            <ul>
+                <li class="menu-item {% if active_menu == 'overview' %}is-active{% endif %}">
+                    <a href="{{ url_for('owner_dashboard') }}">Executive Overview</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'branches' %}is-active{% endif %}">
+                    <a href="{{ url_for('branch_performance') }}">Branch Performance</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'products' %}is-active{% endif %}">
+                    <a href="{{ url_for('product_dashboard') }}">Product Insights</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'access' %}is-active{% endif %}">
+                    <a href="{{ url_for('access_control') }}">Access Control</a>
+                </li>
+                <li class="menu-item {% if active_menu == 'security' %}is-active{% endif %}">
+                    <a href="{{ url_for('security_dashboard') }}">Security & Audit</a>
+                </li>
+            
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='approvals') }}">Approvals (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='finance') }}">Finance Overview (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='inventory') }}">Inventory Watch (Coming Soon)</a>
+                </li>
+                <li class="menu-item is-soon">
+                <a href="{{ url_for('coming_soon', feature='announcements') }}">Announcements (Coming Soon)</a>
+                </li>
+</ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+            <div class="sidebar-copy">© 2025 HARMSTORE · Owner Portal</div>
+        </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="main-content">
+
+        <header class="top-header">
+            <div>
+                <h1 class="page-title">Access Control</h1>
+                <p class="page-subtitle">
+                    Kelola user portal, role, status aktif, reset password, dan audit aktivitas terakhir.
+                    Akses menu ini hanya untuk <b>Owner</b> (atau <b>Superadmin</b>).
+                </p>
+            </div>
+        </header>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-wrapper">
+                    {% for category, msg in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- ONE-TIME PASSWORD INFO -->
+        {% if temp_info %}
+        <section class="card card-otp">
+            <div class="card-header">
+                <h2>Password Baru (Ditampilkan 1x)</h2>
+                <p class="card-subtitle">
+                    Simpan password ini sekarang. Setelah halaman direfresh, password tidak akan ditampilkan lagi.
+                </p>
+            </div>
+
+            <div class="otp-box">
+                <div class="otp-meta">
+                    <div class="otp-row">
+                        <span class="otp-label">Employee ID</span>
+                        <span class="otp-value mono" id="otpEmp">{{ temp_info.employee_id }}</span>
+                        <button class="btn-mini" type="button" data-copy="#otpEmp">Copy</button>
+                    </div>
+                    <div class="otp-row">
+                        <span class="otp-label">Password</span>
+                        <span class="otp-value mono" id="otpPass">{{ temp_info.temp_password }}</span>
+                        <button class="btn-mini" type="button" data-copy="#otpPass">Copy</button>
+                    </div>
+                </div>
+
+                <div class="otp-note">
+                    Setelah user login, disarankan mengganti password secara internal (bisa dibuat menu next kalau kamu mau).
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- USERS TABLE -->
+        <section class="card">
+            <div class="card-header">
+                <h2>User & Role Management</h2>
+                <p class="card-subtitle">
+                    Lihat semua user portal, ubah role, aktif/nonaktif, reset password, dan pantau aktivitas terakhir.
+                </p>
+            </div>
+
+            <div class="card-table">
+                <div class="table-wrapper user-scroll">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Last Action</th>
+                                <th>IP</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users %}
+                                {% for u in users %}
+                                <tr>
+                                    <td class="mono">{{ u.employee_id }}</td>
+                                    <td>{{ u.full_name }}</td>
+                                    <td class="dim">{{ u.email or '-' }}</td>
+
+                                    <td>
+                                        <form method="POST" action="{{ url_for('access_control_update_role') }}" class="inline-form">
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <select name="new_role" class="mini-select">
+                                                {% for r in role_options %}
+                                                    <option value="{{ r }}" {% if r == u.role %}selected{% endif %}>{{ r }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn-mini">Save</button>
+                                        </form>
+                                    </td>
+
+                                    <td>
+                                        {% if u.is_active == 1 %}
+                                            <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-muted">Inactive</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if u.last_login_at %}
+                                            <span class="mono">{{ u.last_login_at }}</span>
+                                        {% else %}
+                                            <span class="dim">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if u.last_action %}
+                                            <div class="stack">
+                                                <span class="dim">{{ u.last_action }}</span>
+                                                {% if u.last_action_at %}
+                                                    <span class="mini mono">{{ u.last_action_at }}</span>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="dim">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="mono dim">{{ u.last_login_ip or '-' }}</td>
+
+                                    <td class="cell-actions">
+                                        <form method="POST" action="{{ url_for('access_control_toggle_active') }}" class="inline-form">
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            {% if u.is_active == 1 %}
+                                                <input type="hidden" name="next_state" value="0">
+                                                <button type="submit" class="btn-mini btn-warn" title="Nonaktifkan user">Disable</button>
+                                            {% else %}
+                                                <input type="hidden" name="next_state" value="1">
+                                                <button type="submit" class="btn-mini" title="Aktifkan user">Enable</button>
+                                            {% endif %}
+                                        </form>
+
+                                        <form method="POST" action="{{ url_for('access_control_reset_password') }}" class="inline-form">
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <button type="submit"
+                                                    class="btn-mini btn-danger"
+                                                    onclick="return confirm('Reset password untuk {{ u.employee_id }}? Password baru akan ditampilkan 1x.')">
+                                                Reset
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="dim" style="text-align:center;padding:16px;">
+                                        Belum ada data user.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORMS -->
+        <section class="grid-2">
+            <!-- CREATE USER -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Tambah User</h2>
+                    <p class="card-subtitle">
+                        Buat user baru (role: owner / superadmin / manager / admin / staff / hr / finance).
+                        Password digenerate otomatis dan ditampilkan 1x.
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ url_for('access_control_create_user') }}" class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="employee_id">Employee ID</label>
+                            <input type="text" id="employee_id" name="employee_id" placeholder="EMP001 / ReiPret" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role_create">Role</label>
+                            <select id="role_create" name="role">
+                                {% for r in role_options %}
+                                <option value="{{ r }}">{{ r }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" id="full_name" name="full_name" placeholder="Nama lengkap" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone_number">No. Telp (optional)</label>
+                            <input type="text" id="phone_number" name="phone_number" placeholder="08xxxxxxxxxx">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email (optional)</label>
+                            <input type="email" id="email" name="email" placeholder="opsional@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date_birth">Date Birth (optional)</label>
+                            <input type="date" id="date_birth" name="date_birth">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Create User</button>
+                </form>
+            </div>
+
+            <!-- EDIT USER -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Edit User</h2>
+                    <p class="card-subtitle">
+                        Edit data user: Employee ID, nama, email, no. telp, tanggal lahir.
+                        (Role & status tetap di tabel atas supaya lebih cepat.)
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ url_for('access_control_update_user') }}" class="form">
+                    <div class="form-group">
+                        <label for="edit_user_id">Pilih User</label>
+                        <select id="edit_user_id" name="user_id" required>
+                            <option value="" selected disabled>-- pilih user --</option>
+                            {% for u in users %}
+                            <option value="{{ u.id }}"
+                                    data-employee-id="{{ u.employee_id }}"
+                                    data-full-name="{{ u.full_name }}"
+                                    data-email="{{ u.email or '' }}"
+                                    data-phone="{{ u.phone_number or '' }}"
+                                    data-dob="{{ u.date_birth or '' }}">
+                                {{ u.employee_id }} — {{ u.full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_employee_id">Employee ID</label>
+                            <input type="text" id="edit_employee_id" name="employee_id" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_full_name">Full Name</label>
+                            <input type="text" id="edit_full_name" name="full_name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_phone">No. Telp</label>
+                            <input type="text" id="edit_phone" name="phone_number" placeholder="08xxxxxxxxxx">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_email">Email</label>
+                            <input type="email" id="edit_email" name="email" placeholder="opsional@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_dob">Date Birth</label>
+                            <input type="date" id="edit_dob" name="date_birth">
+                        </div>
+
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn-primary">Update User</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+(function(){
+    // Copy OTP
+    document.querySelectorAll("[data-copy]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const sel = btn.getAttribute("data-copy");
+            const el = document.querySelector(sel);
+            if(!el) return;
+
+            const text = (el.textContent || "").trim();
+            if(!text) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const old = btn.textContent;
+                btn.textContent = "Copied";
+                setTimeout(() => btn.textContent = old || "Copy", 1200);
+            });
+        });
+    });
+
+    // Autofill Edit User form
+    const sel = document.getElementById("edit_user_id");
+    if(sel){
+        sel.addEventListener("change", () => {
+            const opt = sel.options[sel.selectedIndex];
+            if(!opt) return;
+
+            document.getElementById("edit_employee_id").value = opt.dataset.employeeId || "";
+            document.getElementById("edit_full_name").value = opt.dataset.fullName || "";
+            document.getElementById("edit_email").value = opt.dataset.email || "";
+            document.getElementById("edit_phone").value = opt.dataset.phone || "";
+            document.getElementById("edit_dob").value = opt.dataset.dob || "";
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
