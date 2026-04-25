@@ -220,15 +220,18 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-only-change-me")
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT", "3306")),
+            host="127.0.0.1",        # XAMPP MySQL local
+            user="root",             # default user XAMPP
+            password="",             # default password XAMPP kosong
+            database="database_toko", # nama database di phpMyAdmin
+            port=3306
         )
-        return connection
+
+        if connection.is_connected():
+            return connection
+
     except Error as e:
-        print("Error connecting to MySQL:", e)
+        print("Error connecting to XAMPP MySQL:", e)
         return None
 
 # ============================
