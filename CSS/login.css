@@ -296,9 +296,9 @@ body {
 }
 
 .flash-info {
-    background: rgba(59, 130, 246, 0.12);
-    border: 1px solid rgba(59, 130, 246, 0.9);
-    color: #bfdbfe;
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.9);
+    color: #f308a9;
 }
 
 /* ========== FORM AUTH ========== */
