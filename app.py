@@ -224,7 +224,7 @@ def get_db_connection():
             user="root",             # default user XAMPP
             password="",             # default password XAMPP kosong
             database="database_toko", # nama database di phpMyAdmin
-            port=3306
+            port=3308
         )
 
         if connection.is_connected():
